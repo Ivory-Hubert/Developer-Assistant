@@ -1,0 +1,11 @@
+[project]
+name = "dev-assistant"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "prompt-toolkit>=3.0.52",
+    "rich>=14.3.2",
+    "termcolor>=3.3.0",
+]
