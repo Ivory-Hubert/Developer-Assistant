@@ -5,6 +5,7 @@ import os
 import time
 
 class Opener:
+    @staticmethod
     def open(path):
         #==Check if path exists==
         if not os.path.exists(path):

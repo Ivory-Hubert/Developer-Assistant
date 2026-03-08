@@ -84,7 +84,7 @@ class ProjectsManager:
             print(colored(chosen_project, f"{self.color}"))
             print("\n1. Open project folder.")
             print("2. Update the changelog.")
-            print("3. Backup to the cloud. [X]")
+            print("3. Backup to the cloud. [WIP]")
             print("4. Open project configurations.\n")
 
             choice = input(f"{self.user_path}> ").strip()

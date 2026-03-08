@@ -38,8 +38,7 @@ class Interface:
     
     def load(self):
         #==Check for leftovers==
-        ROOT = Path(__file__).resolve().parents[1]
-        temp_log = ROOT / "Dev-Assistant" / "Projects" / "CHANGELOG.tmp"
+        temp_log = Path(__file__).parent / "Projects" / "CHANGELOG.tmp"
 
         if os.path.exists(temp_log):
             while True:
@@ -185,9 +184,11 @@ class Interface:
             elif choice == "2":
                 pass
             elif choice == "3":
-                Opener.open("memory.ini")
+                memory = Path(__file__).parent / "memory.ini"
+                Opener.open(memory)
             elif choice == "4":
-                Opener.open("Projects")
+                projects = Path(__file__).parent / "Projects"
+                Opener.open(projects)
             else:
                 print("")
                 print(colored("Unknown option...", "light_red", attrs=["blink"]))

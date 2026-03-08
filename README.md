@@ -8,7 +8,7 @@
 
 **Dependencies:** Listed in `requirements.txt`
 
-## Features in action
+## Appearance
 
 ### Coloured, easy-to-use menus
 ![Changelog Menu](Documents/images/changelog-menu.png)
@@ -26,8 +26,6 @@ Developer Assistant is a lightweight TUI tool for automating and managing your c
 You can manage as many projects as you like. Each project gets its own `.ini` file, created automatically through the menu based on the information you provide. These act as links that tell DA where your changelogs are and what's the last version number.
 
 Your files are kept safe at all times. Before adding new changes, your existing `CHANGELOG.md` is automatically backed up. While editing, all changes are written to a temporary file first and only applied to the real changelog once you confirm them.
-
-You can also preview your Markdown changelogs directly in the terminal using Rich-powered rendering.
 
 ### Documentation.
 Documentation includes `SYSTEM STRUCTURE.txt`, example -and default files. If you ever need to replace a file, the example/default files can also be used for that.
