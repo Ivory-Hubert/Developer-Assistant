@@ -22,20 +22,17 @@ class ConfigManager:
         self.templates_folder = self.global_dir / "Templates"
         self.new_project_ini = self.projects_folder / config_file
 
-        #==Run the migration check==
         self.migrate_old_data()
 
-        #== Update last_project in memory.ini==
+        #==Update last_project in memory.ini==
         self.update_last_project = Path(config_file).stem
 
         self.config.read(self.memory_ini)
 
     def migrate_old_data(self):
-        #==Look for old files in repo root==
         old_memory = self.internal_dir / "memory.ini"
         old_projects = self.internal_dir / "Projects"
 
-        #==Move only if old data exists and new data DOESN'T==
         if old_memory.exists() and not self.memory_ini.exists():
             shutil.move(str(old_memory), str(self.memory_ini))
             print(f"Migrated memory.ini to {self.global_dir}")
@@ -46,7 +43,6 @@ class ConfigManager:
             print(f"Migrated Projects folder to {self.global_dir}")
             time.sleep(2)
 
-        #==If user has no Templates/ folder in AppData/.config==
         if not self.templates_folder.exists():
             default_templates = resources.files("DA.Templates")
             user_templates = self.templates_folder

@@ -1,15 +1,12 @@
 # Developer Assistant
 
-> **New here?** Start with [SETUP.md](./SETUP.md) to get started.
+> **Setup info** Start with [SETUP](./SETUP.md) to get started.
 
-> **CHANGELOG** Yes, I keep a [CHANGELOG](./CHANGELOG.md)
+> **Latest changes** Yes, I keep a [CHANGELOG](./CHANGELOG.md)
 
 **Requirements:** Python 3.13 or later.
 
 **Cross-platform:** Windows, Linux, macOS(unverified)
-
-**Dependencies:** Listed in [pyproject.toml](./pyproject.toml)
-
 
 ## Appearance
 
@@ -40,16 +37,20 @@ Don't change the folder structure or modify variable names inside `.ini` files.
 2. **Features and information**
 
 **The user's data (`Templates/`, `Projects/`, `memory.ini`) is stored in standard locations:**
+
 Windows: `C:\Users\...\AppData\Roaming\da-ui\`
+
 Linux: `~/.config/da-ui/`
+
 macOS: `~/Library/Application Support/da-ui/`
 
 The `da-ui/` folder will be created automatically.
+
 You can access its content quickly when going to: `Main menu / Settings`
 
 - *Customizable templates*
 
-Explore the **local** `Templates/` folder and modify the template contents to your liking - **just avoid changing the `{{placeholder}}` names**.
+In the **local** `Templates/` folder you can modify the template contents to your liking - **just avoid changing the `{{placeholder}}` names**.
 
 - *Linked projects all in one place*
 
@@ -82,9 +83,7 @@ Last project gets updated automatically, the rest are up to you.
 
 
 ### Documentation.
-Documentation includes `SYSTEM STRUCTURE.txt`, example -and default files. If you ever need to replace a file, the example/default files can also be used for that.
-`SYSTEM STRUCTURE.txt` - explains what module does what and how the menu flows.
-`CHANGELOG.md` - this programs own changelog.
+Documentation includes SYSTEM STRUCTURE.txt, example -and default files. If you ever need to replace a file, the example/default files can be used for that.
 
 
 ### Setting up your first project
@@ -118,4 +117,5 @@ B. **Using pip:**
 2. `pip install .`
 
 C. **No install, running from repo root:**
+
 Just `git pull`

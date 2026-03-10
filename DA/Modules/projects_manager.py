@@ -31,19 +31,19 @@ class ProjectsManager:
         name = input("Enter new project name: ")
         if name.lower() == "e":
             return
-        # save ini name
+
         print("")
         path = input("Enter project path: ")
-        # save to ini
+
         print("")
         changelog = input("Project changelog path: ")
-        # save to ini
+
         print("")
         version = input("Current project version: ")
-        # save to ini
+
         print("")
         cloud = input("Cloud service (OneDrive/Azure/Dropbox/Google Drive): ")
-        # save to ini
+
         print("")
         confirm = input("Confirm(Y) or abort(E): ")
         if confirm.lower() == "e":

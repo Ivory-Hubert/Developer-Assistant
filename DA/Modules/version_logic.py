@@ -29,7 +29,6 @@ class VersionLogic:
 
         self.load_manager = ConfigManager(f"{project}.ini")
         self.setting = self.load_manager.load_project()
-
         self.changelog_path = Path(self.setting.get('changelog'))
 
         now = datetime.now()
@@ -92,11 +91,10 @@ class VersionLogic:
         if version.lower() == "e":
             return
         change_type = input("\nChange type: ")
-        # Save new projects version
+
         entry = prompt("\nFirst entry: ")
-        # Save first entry
+
         comment = prompt("\nOptional comment: ")
-        # Save optional comment
 
         choice = input("\nSave (Enter) Cancel (E).\nAdd further entries with 'Add new changes' in the menu.")
         if choice.lower() == "e":
@@ -110,9 +108,8 @@ class VersionLogic:
             "comments": comment
         }
 
-        #==Load template==
         template = self.template_loader("changelog_template.txt")
-        #==Render template==
+
         rendered = self.template_renderer(template, data)
 
         mode = "a" if os.path.exists(self.changelog_path) else "w"
@@ -140,7 +137,6 @@ class VersionLogic:
             print("5. Deprecated")
             print("6. Security\n")
 
-            #==Print the latest changelog entry==
             print(colored("Last changelog entry:", f"{self.color}"))
             if not self.change_type:
                 print("No changes yet.\n")
@@ -161,7 +157,6 @@ class VersionLogic:
             "6": "Security"
             }
 
-            #==Save the change type==
             self.change_type = type_map.get(type_choice.lower())
 
             if type_choice.lower() == "e":
@@ -182,7 +177,6 @@ class VersionLogic:
     def prepend_changes(self):
         header = f"### {self.change_type}"
 
-        #==Read existing content==
         existing = ""
         if os.path.exists(self.templog_path):
             with open(self.templog_path, "r", encoding="utf-8") as f:
@@ -204,17 +198,15 @@ class VersionLogic:
 
             self.comment = prompt("\nOptional comment: ")
 
-            #==Gather data==
             data = {
                 "changes": self.change,
                 "comments": self.comment
             }
 
-            #==Load template==
             template = self.template_loader("entry_template.txt")
-            #==Render template==
+
             rendered = self.template_renderer(template, data)
-            #==Append the changes==
+
             with open(self.templog_path, "a", encoding="utf-8") as f:
                 f.write(rendered + "\n")
 
@@ -247,21 +239,18 @@ class VersionLogic:
 
         print("\nWorking...")
 
-        #==Data for the header==
         header_data = {
         "version": version,
         "date": self.today
         }
 
-        #==Load and render header==
         header_template = self.template_loader("header_template.txt")
         header_rendered = self.template_renderer(header_template, header_data)
 
-        #==If exists, read old changelog==
         old_content = ""
         if os.path.exists(self.changelog_path):
             #==Make a duplicate of the old changelog==
-            log_name = f"Changelog-Backup-{self.today}.md"
+            log_name = f"Changelog-{self.today}.md"
             project_folder = Path(self.setting.get('path'))
             duplicate_path = project_folder / log_name
 
@@ -269,16 +258,13 @@ class VersionLogic:
             dest = duplicate_path
             shutil.copy2(src,dest)
 
-            print("\nOld changelog backed up as: " + colored(f"Changelog-Backup-{self.today}.md", f"{self.color}"))
+            print("\nOld changelog backed up as: " + colored(f"{log_name}", f"{self.color}"))
 
-            #==Read old changelog==
             with open(self.changelog_path, "r", encoding="utf-8") as f:
                 old_content = f.read()
 
-        #==Combine everything==
         combined = header_rendered + "\n" + templog_content + "\n" + old_content
 
-        #==Overwrite the real changelog==
         with open(self.changelog_path, "w", encoding="utf-8") as f:
             f.write(combined)
 

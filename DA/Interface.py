@@ -16,7 +16,7 @@ from importlib import resources
 
 class Interface:
     def __init__(self, color="light_blue"):
-        self.version = "0.1.0"
+        self.version = "0.2.0"
         title = f"DA - {self.version}"
 
         if platform.system() == "Windows":
@@ -26,7 +26,6 @@ class Interface:
 
         self.config = ConfigManager('memory.ini')
 
-        #==Check for memory.ini==
         first_run = False
         if not self.config.memory_ini.exists():
             self.local_init()
@@ -43,14 +42,12 @@ class Interface:
         self.clear_screen = 'cls' if platform.system() == 'Windows' else 'clear'
         self.user_path = os.environ.get('USERPROFILE') or os.environ.get('HOME', 'User')
         
-        #==Display intro if memory.ini did NOT exist==
         if first_run:
             self.intro()
 
         self.load()
     
     def load(self):
-        #==Check for leftovers==
         temp_log = Path(__file__).parent / "CHANGELOG.tmp"
 
         if os.path.exists(temp_log):
@@ -68,7 +65,6 @@ class Interface:
                     print(colored("\nPlease make a valid choice.", "light_red"))
                     time.sleep(1.5)
 
-        #==Welcome message==
         os.system(self.clear_screen)
         message = (colored("Developer Assistant Ver. ", attrs=["bold"]) + (colored(self.version, f"{self.color}", attrs=["bold"])))
         status = (colored("Loading, please wait... ", attrs=["blink"]))
@@ -77,7 +73,6 @@ class Interface:
         print("")
         print(status.center(73))
         
-        #==Progress bar==
         for i in track(range(20)):
             time.sleep(0.10)
         
@@ -140,11 +135,9 @@ class Interface:
                     print(colored("\nLast project has not been defined...", "light_red", attrs=["blink"]))
                     time.sleep(2)
                 else:
-                    #==Call ProjectsManager==
                     self.projects_manager.load_project(f"{project}")
 
             elif choice == "2":
-                #==Call ProjectsManager==
                 self.projects_manager.new_project()
 
             elif choice.lower() in ("a", "b", "c"):
@@ -161,7 +154,6 @@ class Interface:
                     print(colored(f"Project '{choice}' has not been defined...", "light_red", attrs=["blink"]))
                     time.sleep(2)
                 else:
-                    #==No error? Call ProjectsManager=
                     project = self.memory.get(key)
                     self.projects_manager.load_project(f"{project}")
 
@@ -204,8 +196,6 @@ class Interface:
                 time.sleep(2)
 
     def local_init(self):
-        #==Initialize local files==
-        # memory.ini
         default_files = resources.files("DA.default")
         dest = self.config.memory_ini
 
@@ -213,7 +203,6 @@ class Interface:
             if item.name == "default-memory.ini":
                 shutil.copy(item, dest)
 
-        # Projects folder
         self.config.projects_folder.mkdir(parents=True, exist_ok=True)
         # Add Test-Project
         dest = self.config.projects_folder
@@ -222,7 +211,6 @@ class Interface:
                 shutil.copy(item, dest)
 
     def intro(self):
-        #==Greet with intro text==
         os.system(self.clear_screen)
         print(colored("Welcome to the Developer Assistant\n", f"{self.color}", attrs=["bold"]))
         print("Here's everything you need to get started:\n")
@@ -247,10 +235,7 @@ def main():
     except KeyboardInterrupt:
         print("\n\n" + colored("Execution interrupted by the user. Exiting...", "magenta", attrs=["bold"]))
         time.sleep(2)
-        try:
-            sys.exit(0)
-        except:
-            os._exit(0)
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()
