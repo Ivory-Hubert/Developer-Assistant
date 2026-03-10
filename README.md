@@ -1,8 +1,8 @@
 # Developer Assistant
 
-> **Setup info** Start with [SETUP](./SETUP.md) to get started.
+> **Setup info:** Start with [SETUP](./SETUP.md) to get started.
 
-> **Latest changes** Yes, I keep a [CHANGELOG](./CHANGELOG.md)
+> **Latest changes:** Yes, I keep a [CHANGELOG](./CHANGELOG.md)
 
 **Requirements:** Python 3.13 or later.
 
