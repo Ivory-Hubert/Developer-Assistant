@@ -10,8 +10,8 @@ from prompt_toolkit import prompt
 from rich.console import Console
 from rich.markdown import Markdown
 
-from Modules.config_manager import ConfigManager
-from Modules.opener import Opener
+from DA.Modules.config_manager import ConfigManager
+from DA.Modules.opener import Opener
 
 class VersionLogic:
     def __init__(self, color="light_blue"):
@@ -34,8 +34,9 @@ class VersionLogic:
 
         now = datetime.now()
         self.today = now.strftime("%Y-%m-%d")
+
         ROOT = Path(__file__).resolve().parents[1]
-        self.templog_path = ROOT / "Projects" / "CHANGELOG.tmp"
+        self.templog_path = ROOT / "CHANGELOG.tmp"
 
         while True:
             os.system(self.clear_screen)
@@ -313,8 +314,7 @@ class VersionLogic:
         return
 
     def template_loader(self, template_file):
-        ROOT = Path(__file__).resolve().parents[1]
-        template_path = ROOT / "Templates" / template_file
+        template_path = self.config.templates_folder / template_file
 
         with open(template_path, "r", encoding="utf-8") as f:
             return f.read()

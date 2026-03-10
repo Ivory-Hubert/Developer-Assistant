@@ -1,12 +1,15 @@
 # Developer Assistant
 
-> **New here?** Start with [SETUP.md](./SETUP.md) to get started!
+> **New here?** Start with [SETUP.md](./SETUP.md) to get started.
+
+> **CHANGELOG** Yes, I keep a [CHANGELOG](./CHANGELOG.md)
 
 **Requirements:** Python 3.13 or later.
 
 **Cross-platform:** Windows, Linux, macOS(unverified)
 
-**Dependencies:** Listed in `requirements.txt`
+**Dependencies:** Listed in [pyproject.toml](./pyproject.toml)
+
 
 ## Appearance
 
@@ -18,6 +21,7 @@ Preview your Markdown changelogs directly in the terminal with Rich rendering:
 
 ![Changelog Preview](Documents/images/md-preview.png)
 
+
 ## Introduction
 
 ### What does this tool do?
@@ -27,12 +31,6 @@ You can manage as many projects as you like. Each project gets its own `.ini` fi
 
 Your files are kept safe at all times. Before adding new changes, your existing `CHANGELOG.md` is automatically backed up. While editing, all changes are written to a temporary file first and only applied to the real changelog once you confirm them.
 
-### Documentation.
-Documentation includes `SYSTEM STRUCTURE.txt`, example -and default files. If you ever need to replace a file, the example/default files can also be used for that.
-
-`SYSTEM STRUCTURE.txt` - explains what module does what and how the menu flows.
-
-`CHANGELOG.md` - this programs own changelog.
 
 ### Using the program.
 1. **What *not* to do**
@@ -41,32 +39,32 @@ Don't change the folder structure or modify variable names inside `.ini` files.
 
 2. **Features and information**
 
-If you want a dummy changelog to experiment with, open `Projects/Test-Project.ini` and adjust the file paths to match your system.
+**The user's data (`Templates/`, `Projects/`, `memory.ini`) is stored in standard locations:**
+Windows: `C:\Users\...\AppData\Roaming\da-ui\`
+Linux: `~/.config/da-ui/`
+macOS: `~/Library/Application Support/da-ui/`
 
-The included `Test-Project/` folder is part of the program and is easy to experiment with.
-
-Once configured, you can create as many changelog entries as you want by picking that project in the menu.
+The `da-ui/` folder will be created automatically.
+You can access its content quickly when going to: `Main menu / Settings`
 
 - *Customizable templates*
 
-Explore the `Templates/` folder and modify the template contents to your liking - **just avoid changing the `{{placeholder}}` names**.
+Explore the **local** `Templates/` folder and modify the template contents to your liking - **just avoid changing the `{{placeholder}}` names**.
 
 - *Linked projects all in one place*
 
-The `Projects/` folder holds the `.ini` files you create when starting a new project with the program. 
-Temporary changelogs also appear there.
+The `Projects/` folder holds the `.ini` files you create when starting a new project with DA. 
 
 - *Safe changelog updates*
 
 Before applying any changes, your previous `CHANGELOG.md` is automatically backed up into your project folder. 
-
 New changes are first written to a temporary file and only applied to the real changelog after you confirm them.
-
 This ensures your existing changelog is never overwritten or corrupted, and you always have a fallback copy.
+If the temporary changelog is present on startup you are prompted to remove or keep it.
 
 - *Ease of navigation*
 
-You can access *most* files/folders and configuration straight from the menus, so you shouldn't find yourself searching through the program's directory very often.
+You can access files/folders and configuration straight from the menus, so you shouldn't find yourself searching through the program's directory or even your local user data very often.
 
 - *Configuration*
 
@@ -78,29 +76,46 @@ The `memory.ini` file does exactly what you'd expect, it features:
 
 > Custom colour
 
-> Toggle intro
-
-Last project gets updated automatically, the rest are up to you. `Toggle intro` is on by default.
+Last project gets updated automatically, the rest are up to you.
 
 - *`Ctrl+C` works everywhere to quickly exit DA.*
 
-### "I deleted this file, what now?"
-No problem:
 
-`memory.ini` - copy `memory example.ini` to the main folder and rename it.
+### Documentation.
+Documentation includes `SYSTEM STRUCTURE.txt`, example -and default files. If you ever need to replace a file, the example/default files can also be used for that.
+`SYSTEM STRUCTURE.txt` - explains what module does what and how the menu flows.
+`CHANGELOG.md` - this programs own changelog.
 
-`Any changelog template` - `default changelog.md`, copy that to `Templates/` 
 
-**and make** = {
+### Setting up your first project
+For a dummy changelog to experiment with, navigate to `Main menu / Projects`, choose `Test-Project`, then choose option `4.` to start adjusting this projects paths. 
 
-changelog_template.txt,
+The `Test-Project/` folder is included in the programs root folder for repo clones and is safe to experiment with. If you installed from an URL just make a `CHANGELOG.md` anywhere and point the `.ini` file to it.
 
-entry_template.txt,
+Once configured, you can create as many changelog entries as you want by picking that project in the menu.
 
-header_template.txt
 
-}
+## Updating DA
+Two possibilities, depending on how you installed.
 
-**Of course cut its contents up to match the description of the file you lost.**
+### 1. Installed directly from GitHub URL
+A. **Using uv:**
+1. `uv tool install git+https://github.com/Ivory-Hubert/Developer-Assistant`
 
-*Or download new files if you want.*
+B. **Using pip:**
+1. `pip install --upgrade git+https://github.com/Ivory-Hubert/Developer-Assistant`
+
+
+### 2. Installed from a local clone
+*Run all terminal commands in the repo folder*
+
+A. **Using uv:**
+1. `git pull`
+2. `uv tool install .`
+
+B. **Using pip:**
+1. `git pull`
+2. `pip install .`
+
+C. **No install, running from repo root:**
+Just `git pull`

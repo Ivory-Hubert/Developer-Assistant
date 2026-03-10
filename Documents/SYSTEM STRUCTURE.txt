@@ -1,14 +1,14 @@
 Modules:
 Interface.py (Entry point/Main TUI)
-projects_manager.py (Gather the data of new ini files, forwards it for creating a new one or overwriting.)
+projects_manager.py (Gather the data for new ini files, forwards it for creating a new one or overwriting.)
 config_manager.py (Loads ini files and/or overwrites them with ProjectsManager()'s help.)
 version_logic.py (Creates/updates the changelogs of the projects)
 opener.py (Cross-platform file and folder opening utility)
 
-cloud_backup.py * (Backs up the changes into the users preferred cloud service)
-(* - not yet started)
+Planned:
+cloud_backup.py (Backs up the changes into the users preferred cloud service)
 ===============================================================================
-
+(* - not yet started)
 Structure:
 
     	Assistant's TUI

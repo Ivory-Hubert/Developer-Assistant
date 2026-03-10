@@ -1,3 +1,25 @@
+## [0.2.0] - 2026-03-10
+
+### Fixed
+- **Opening of projects.**
+
+Fixed `ConfigManager` trying to read project `.ini` files that are mistyped in `memory.ini` or don't exist in `Projects/`.
+
+### Changed
+- **Turned DA into a package**
+
+Changed the folder structure and `pyproject.toml` to include `Templates/` and defaults if users install the packaged tool system-wide.
+
+- **Updated the documentation**
+
+The intro is now separate from README. SETUP now accurately describes how to install the tool with uv, pip or make a shortcut, or just run it from root.
+
+### Added
+- **Migration and default logic**
+
+Now that user data lives in their local OS-specific config folders, I decided a first run protocol is needed. So now with every update the default templates are packaged with DA and if they dont exist in the users config folder, they get copied there. Now the absence of a local `memory.ini` signals to DA that it's a first run. In that case `Projects/` spawns in with `Test-Project.ini` pre loaded, and `memory.ini` comes with just Test-Project pinned.
+
+
 ## [0.1.0] - 2026-03-07
 
 ### Added

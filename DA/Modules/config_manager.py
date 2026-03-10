@@ -1,21 +1,66 @@
 import configparser
 from pathlib import Path
+import shutil
+import time
+
+from platformdirs import user_config_path
+
+from importlib import resources
 
 class ConfigManager:
     def __init__(self, config_file):
         self.config = configparser.ConfigParser()
         
-        ROOT = Path(__file__).resolve().parents[1]
+        #==Path setup==
+        self.internal_dir = Path(__file__).resolve().parents[1]
+        self.global_dir = user_config_path("da-ui")
+        self.global_dir.mkdir(parents=True, exist_ok=True)
         
-        #== Update last_project in memory.ini: ==
-        self.update_last_project = Path(config_file).stem
-        #== ini paths: ==
-        self.memory_ini = ROOT / 'memory.ini'
-        self.ini_path = ROOT / config_file
-        self.new_project_ini = ROOT / "Projects" / config_file
+        #==Specific targets==
+        self.memory_ini = self.global_dir / 'memory.ini'
+        self.projects_folder = self.global_dir / "Projects"
+        self.templates_folder = self.global_dir / "Templates"
+        self.new_project_ini = self.projects_folder / config_file
 
-        self.config.read(self.ini_path)
-        
+        #==Run the migration check==
+        self.migrate_old_data()
+
+        #== Update last_project in memory.ini==
+        self.update_last_project = Path(config_file).stem
+
+        self.config.read(self.memory_ini)
+
+    def migrate_old_data(self):
+        #==Look for old files in repo root==
+        old_memory = self.internal_dir / "memory.ini"
+        old_projects = self.internal_dir / "Projects"
+
+        #==Move only if old data exists and new data DOESN'T==
+        if old_memory.exists() and not self.memory_ini.exists():
+            shutil.move(str(old_memory), str(self.memory_ini))
+            print(f"Migrated memory.ini to {self.global_dir}")
+            time.sleep(2)
+
+        if old_projects.exists() and not self.projects_folder.exists():
+            shutil.move(str(old_projects), str(self.projects_folder))
+            print(f"Migrated Projects folder to {self.global_dir}")
+            time.sleep(2)
+
+        #==If user has no Templates/ folder in AppData/.config==
+        if not self.templates_folder.exists():
+            default_templates = resources.files("DA.Templates")
+            user_templates = self.templates_folder
+
+            user_templates.mkdir(parents=True, exist_ok=True)
+
+            for item in default_templates.iterdir():
+                dest = user_templates / item.name
+                if not dest.exists():
+                    shutil.copy(item, dest)
+
+            print(f"Copied default Templates to {self.global_dir}")
+            time.sleep(2)
+
     def load_memory(self):
         prj = self.config['ITEMS']
         return {
@@ -23,7 +68,6 @@ class ConfigManager:
             'pinned_project': prj.get('pinned_project'),
             'pinned_project1': prj.get('pinned_project1'),
             'pinned_project2': prj.get('pinned_project2'),
-            'intro': self.config.get("CONFIG", "intro"),
             'color': self.config.get("CONFIG", "color")
         }
 
@@ -57,7 +101,14 @@ class ConfigManager:
         #==Return project ini variables==
         project_parser = configparser.ConfigParser()
         project_parser.read(self.new_project_ini)
-        
+        '''
+        try:
+            prj = project_parser['SETTINGS']
+        except KeyError:
+            print(f"\nCan't find {self.new_project_ini}")
+            time.sleep(2)
+            return
+        '''
         prj = project_parser['SETTINGS']
         return {
             'path': prj.get('path'),

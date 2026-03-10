@@ -1,17 +1,18 @@
 ﻿import os, sys
 import time
-import configparser
 import platform
+import subprocess
+import shutil
 from pathlib import Path
 from termcolor import colored
 from rich.progress import track
 from rich.console import Console
 from rich.markdown import Markdown
-import subprocess
 
-from Modules.projects_manager import ProjectsManager
-from Modules.config_manager import ConfigManager
-from Modules.opener import Opener
+from DA.Modules.projects_manager import ProjectsManager
+from DA.Modules.config_manager import ConfigManager
+from DA.Modules.opener import Opener
+from importlib import resources
 
 class Interface:
     def __init__(self, color="light_blue"):
@@ -22,10 +23,18 @@ class Interface:
             os.system(f'title {title}')
         else:
             print(f'\33]0;{title}\a', end='', flush=True)
-        
-        self.projects_manager = ProjectsManager()
 
         self.config = ConfigManager('memory.ini')
+
+        #==Check for memory.ini==
+        first_run = False
+        if not self.config.memory_ini.exists():
+            self.local_init()
+            self.config = ConfigManager('memory.ini')
+            first_run = True
+
+        self.projects_manager = ProjectsManager()
+
         self.memory = self.config.load_memory()
         self.color = self.memory.get('color') or color
         
@@ -34,16 +43,20 @@ class Interface:
         self.clear_screen = 'cls' if platform.system() == 'Windows' else 'clear'
         self.user_path = os.environ.get('USERPROFILE') or os.environ.get('HOME', 'User')
         
+        #==Display intro if memory.ini did NOT exist==
+        if first_run:
+            self.intro()
+
         self.load()
     
     def load(self):
         #==Check for leftovers==
-        temp_log = Path(__file__).parent / "Projects" / "CHANGELOG.tmp"
+        temp_log = Path(__file__).parent / "CHANGELOG.tmp"
 
         if os.path.exists(temp_log):
             while True:
                 os.system(self.clear_screen)
-                print(colored("Temporary changelog detected.\n", "yellow"))
+                print(colored(f"Temporary changelog detected in:\n{temp_log}\n", "yellow"))
                 print(colored("D", "light_red") + "elete or " + colored("K", "light_red") + "eep?\n")
                 choice = input(f"{self.user_path}> ").lower()
                 if choice == "d":
@@ -67,11 +80,6 @@ class Interface:
         #==Progress bar==
         for i in track(range(20)):
             time.sleep(0.10)
-
-        #==Check intro state==
-        intro = self.memory.get('intro')
-        if intro == "True":
-            self.intro()
         
         self.menu()
         
@@ -173,7 +181,8 @@ class Interface:
             print("2. Change program's color [WIP]\n")
             print(colored("Other options", attrs=["underline"]))
             print("3. Open memory.ini manually")
-            print("4. Open the Projects folder\n")
+            print("4. Open the Projects folder")
+            print("5. Open the Templates folder\n")
 
             choice = input(f"{self.user_path}> ").strip()
 
@@ -184,29 +193,43 @@ class Interface:
             elif choice == "2":
                 pass
             elif choice == "3":
-                memory = Path(__file__).parent / "memory.ini"
-                Opener.open(memory)
+                Opener.open(self.config.memory_ini)
             elif choice == "4":
-                projects = Path(__file__).parent / "Projects"
-                Opener.open(projects)
+                Opener.open(self.config.projects_folder)
+            elif choice == "5":
+                Opener.open(self.config.templates_folder)
             else:
                 print("")
                 print(colored("Unknown option...", "light_red", attrs=["blink"]))
                 time.sleep(2)
 
+    def local_init(self):
+        #==Initialize local files==
+        # memory.ini
+        default_files = resources.files("DA.default")
+        dest = self.config.memory_ini
+
+        for item in default_files.iterdir():
+            if item.name == "default-memory.ini":
+                shutil.copy(item, dest)
+
+        # Projects folder
+        self.config.projects_folder.mkdir(parents=True, exist_ok=True)
+        # Add Test-Project
+        dest = self.config.projects_folder
+        for item in default_files.iterdir():
+            if item.name == "Test-Project.ini":
+                shutil.copy(item, dest)
+
     def intro(self):
+        #==Greet with intro text==
         os.system(self.clear_screen)
         print(colored("Welcome to the Developer Assistant\n", f"{self.color}", attrs=["bold"]))
         print("Here's everything you need to get started:\n")
 
         time.sleep(2)
 
-        ROOT = Path(__file__).resolve().parents[1]
-        readme_file = ROOT / "Dev-Assistant" / "README.md"
-
-        readme_content = ""
-        with open(readme_file, "r", encoding="utf-8") as f:
-            readme_content = f.read()
+        readme_content = resources.files("DA").joinpath("intro.md").read_text()
 
         MARKDOWN = readme_content
         console = Console()
@@ -215,13 +238,12 @@ class Interface:
 
         input("\nContinue..." + colored("[Enter]", f"{self.color}"))
 
-        self.config.update_memory("CONFIG", "intro", "False")
-
         self.menu()
-            
-if __name__ == "__main__":
+
+def main():
     try:
         app = Interface()
+        app.run()
     except KeyboardInterrupt:
         print("\n\n" + colored("Execution interrupted by the user. Exiting...", "magenta", attrs=["bold"]))
         time.sleep(2)
@@ -229,3 +251,6 @@ if __name__ == "__main__":
             sys.exit(0)
         except:
             os._exit(0)
+
+if __name__ == "__main__":
+    main()

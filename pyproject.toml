@@ -1,11 +1,23 @@
 [project]
-name = "dev-assistant"
+name = "DA-ui"
 version = "0.1.0"
-description = "Add your description here"
+description = "A lightweight TUI designed to simplify formatting of Markdown changelogs."
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
+    "platformdirs>=4.9.4",
     "prompt-toolkit>=3.0.52",
     "rich>=14.3.2",
     "termcolor>=3.3.0",
 ]
+
+[project.scripts]
+da-ui = "DA.Interface:main"
+
+[tool.setuptools]
+packages = ["DA", "DA.Modules", "DA.Templates", "DA.default"]
+
+[tool.setuptools.package-data]
+"DA" = ["intro.md"]
+"DA.Templates" = ["*"]
+"DA.default" = ["*"]

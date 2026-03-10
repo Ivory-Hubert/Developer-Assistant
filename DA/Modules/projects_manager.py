@@ -4,9 +4,10 @@ from termcolor import colored
 import subprocess
 import platform
 from pathlib import Path
-from Modules.config_manager import ConfigManager
-from Modules.version_logic import VersionLogic
-from Modules.opener import Opener
+
+from DA.Modules.config_manager import ConfigManager
+from DA.Modules.version_logic import VersionLogic
+from DA.Modules.opener import Opener
 
 class ProjectsManager:
     def __init__(self, color="light_blue"):
@@ -70,11 +71,16 @@ class ProjectsManager:
         while True:
             chosen_project = f"{project}"
             self.load_manager = ConfigManager(f"{project}.ini")
-            self.setting = self.load_manager.load_project()
+            try:
+                self.setting = self.load_manager.load_project()
+            except KeyError:
+                print(colored(f"\nCan't find {chosen_project}.ini", "light_red"))
+                time.sleep(2)
+                return
+
             self.version_logic = VersionLogic()
 
-            ROOT = Path(__file__).resolve().parents[1]
-            project_ini_path = ROOT / "Projects" / f"{chosen_project}.ini"
+            project_ini_path = self.load_manager.projects_folder / f"{chosen_project}.ini"
 
             os.system(self.clear_screen)
             print("Main menu / Projects / Project menu")
