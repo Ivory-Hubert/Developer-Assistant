@@ -1,5 +1,5 @@
 [project]
-name = "DA-ui"
+name = "developer-assistant"
 version = "0.2.0"
 description = "A lightweight TUI designed to simplify formatting of Markdown changelogs."
 readme = "README.md"
