@@ -1,3 +1,4 @@
+[![PyPI version](https://img.shields.io/pypi/v/developer-assistant.svg)](https://pypi.org/project/developer-assistant/)
 # Developer Assistant
 
 > **Setup info:** Start with [SETUP](./SETUP.md) to get started.
