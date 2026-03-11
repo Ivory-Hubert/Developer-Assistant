@@ -1,9 +1,11 @@
-## Installing directly from GitHub URL (Best for most users):
+# Setup instructions
+
+## Installing from PyPI (Easiest and recommended):
 **Using uv:**
-`uv tool install git+https://github.com/Ivory-Hubert/Developer-Assistant`
+`uv tool install developer-assistant`
 
 **Using pip:**
-`pip install git+https://github.com/Ivory-Hubert/Developer-Assistant`
+`pip install developer-assistant`
 
 **Then use `da-ui` anywhere in your terminal to run it**
 
@@ -11,7 +13,7 @@
 
 
 ## Installing from a cloned repository:
-**Using uv (recommended):**
+**Using uv (recommended for clones):**
 1. Open the program's root folder in your terminal.
 2. Run `uv tool install .`
 3. Then use `da-ui` anywhere in the system to run it.
