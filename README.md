@@ -44,11 +44,11 @@ Don't change the folder structure or modify variable names inside `.ini` files.
 
 **The user's data (`Templates/`, `Projects/`, `memory.ini`) is stored in standard locations:**
 
-Windows: `C:\Users\...\AppData\Roaming\da-ui\`
+* Windows: `C:\Users\...\AppData\Roaming\da-ui\`
 
-Linux: `~/.config/da-ui/`
+* Linux: `~/.config/da-ui/`
 
-macOS: `~/Library/Application Support/da-ui/`
+* macOS: `~/Library/Application Support/da-ui/`
 
 The `da-ui/` folder will be created automatically.
 
@@ -77,11 +77,11 @@ You can access files/folders and configuration straight from the menus, so you s
 
 The `memory.ini` file does exactly what you'd expect, it features:
 
-> Last project
+* Last project
 
-> Pinned projects
+* Pinned projects
 
-> Custom colour
+* Custom colour
 
 Last project gets updated automatically, the rest are up to you.
 
@@ -109,10 +109,12 @@ B. **Using pip:** `python -m pip install -U developer-assistant`
 *Run all terminal commands in the repo folder*
 
 A. **Using uv:**
+
 1. `git pull`
 2. `uv tool install .`
 
 B. **Using pip:**
+
 1. `git pull`
 2. `pip install .`
 

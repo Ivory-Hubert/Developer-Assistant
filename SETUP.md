@@ -12,6 +12,10 @@
 > [!TIP] 
 > Once setup is complete and you start the program, an intro with all the necessary information will be displayed for you in the terminal.
 
+> **Linux note:**
+> Avoid using `sudo pip install` because it installs into the system Python.
+If you want a system‑wide install, use the uv method or use `pip install --user`
+
 
 ## Installing from a cloned repository:
 **Using uv (recommended for clones):**
@@ -59,12 +63,17 @@ nano ~/.local/bin/da-ui
 cd /home/.../.../Developer-Assistant && uv run -m da.interface
 ```
 
-3. **Make the .desktop file:**
+3. **Make the script excecutable:**
+```bash
+chmod +x ~/.local/bin/da-ui
+```
+
+4. **Make the .desktop file:**
 ```bash
 nano ~/.local/share/applications/da-ui.desktop
 ```
 
-4. **Add the details:**
+5. **Add the details:**
 ```bash
 [Desktop Entry]
 Type=Application
