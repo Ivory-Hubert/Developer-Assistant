@@ -9,7 +9,8 @@
 
 **Then use `da-ui` anywhere in your terminal to run it**
 
-> **Tip: Once setup is complete and you start the program, an intro with all the necessary information will be displayed for you in the terminal.**
+> [!TIP] 
+> Once setup is complete and you start the program, an intro with all the necessary information will be displayed for you in the terminal.
 
 
 ## Installing from a cloned repository:
@@ -38,11 +39,13 @@ This creates a local environment and installs all required dependencies.
 
 **Now you can run the program from the root folder like this:**
 
-2. `uv run -m DA.Interface`
+2. `uv run -m da.interface`
 
-You can then also create an `Interface.py` shortcut to use the program. (*Icons included.*)
+> [!NOTE]
+> You can then also create an `Interface.py` shortcut to use the program. (*Icons included.*)
 
-(*Note that in this case the program will also run from the repo folder, not system-wide.*)
+Note that in this case the program will also run from the repo folder, not system-wide.
+
 
 ### Creating a shortcut on Linux:
 1. **Make the exe script:**
@@ -53,7 +56,7 @@ nano ~/.local/bin/da-ui
 2. **Write this, with your own repository location:**
 ```bash
 #!/bin/bash
-cd /home/.../.../Developer-Assistant && uv run -m DA.Interface
+cd /home/.../.../Developer-Assistant && uv run -m da.interface
 ```
 
 3. **Make the .desktop file:**

@@ -44,7 +44,7 @@ class ConfigManager:
             time.sleep(2)
 
         if not self.templates_folder.exists():
-            default_templates = resources.files("DA.Templates")
+            default_templates = resources.files("da.templates")
             user_templates = self.templates_folder
 
             user_templates.mkdir(parents=True, exist_ok=True)

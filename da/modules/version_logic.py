@@ -10,8 +10,8 @@ from prompt_toolkit import prompt
 from rich.console import Console
 from rich.markdown import Markdown
 
-from DA.Modules.config_manager import ConfigManager
-from DA.Modules.opener import Opener
+from da.modules.config_manager import ConfigManager
+from da.modules.opener import Opener
 
 class VersionLogic:
     def __init__(self, color="light_blue"):

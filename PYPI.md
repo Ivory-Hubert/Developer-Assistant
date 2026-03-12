@@ -1,29 +1,22 @@
 # Developer Assistant
-[![PyPI version](https://img.shields.io/pypi/v/developer-assistant?logo=pypi&logoColor=white&color=blue)](https://pypi.org/project/developer-assistant/)
 
-> **A lightweight TUI designed to simplify formatting of Markdown changelogs.**
+## Installing from PyPI
+**Using uv:**
+`uv tool install developer-assistant`
 
-* **Setup:** Start with [SETUP](./SETUP.md) to get started.
+**Using pip:**
+`pip install developer-assistant`
 
-* **Changes:** Yes, I keep a [CHANGELOG](./CHANGELOG.md)
+**Then use `da-ui` anywhere in your terminal to run it**
 
----
+> **Tip:** Once setup is complete and you start the program, an intro with all the necessary information will be displayed for you in the terminal.
 
-**Requirements:** Python 3.10 or later.
+## Updating DA
+Two possibilities, depending on how you installed.
 
-**Cross-platform:** Windows, Linux, macOS(*unverified*)
+A. **Using uv:** `uv tool upgrade developer-assistant`
 
-
-## Appearance
-
-### Coloured, easy-to-use menus
-![Changelog Menu](Documents/images/changelog-menu.png)
-
-### Beautiful changelog previews
-Preview your Markdown changelogs directly in the terminal with Rich rendering:
-
-![Changelog Preview](Documents/images/md-preview.png)
-
+B. **Using pip:** `python -m pip install -U developer-assistant`
 
 ## Introduction
 
@@ -87,35 +80,9 @@ Last project gets updated automatically, the rest are up to you.
 
 - *`Ctrl+C` works everywhere to quickly exit DA.*
 
-
 ### Setting up your first project
 For a dummy changelog to experiment with, navigate to `Main menu / Projects`, choose `Test-Project`, then choose option `4.` to start adjusting this projects paths. 
 
-The `Test-Project/` folder is included in the programs root folder for repo clones and is safe to experiment with. If you installed from PyPI just make a `CHANGELOG.md` anywhere and point the `.ini` file to it.
+Now make an optional `Test-Project/` folder with a `CHANGELOG.md` in it anywhere on your system and point the `.ini` file to it.
 
 Once configured, you can create as many changelog entries as you want by picking that project in the menu.
-
-
-## Updating DA
-Two possibilities, depending on how you installed.
-
-### 1. Installed from PyPI
-A. **Using uv:** `uv tool upgrade developer-assistant`
-
-B. **Using pip:** `python -m pip install -U developer-assistant`
-
-
-### 2. Installed from a local clone
-*Run all terminal commands in the repo folder*
-
-A. **Using uv:**
-1. `git pull`
-2. `uv tool install .`
-
-B. **Using pip:**
-1. `git pull`
-2. `pip install .`
-
-C. **No install, running from repo root:**
-
-Just `git pull`

@@ -5,9 +5,9 @@ import subprocess
 import platform
 from pathlib import Path
 
-from DA.Modules.config_manager import ConfigManager
-from DA.Modules.version_logic import VersionLogic
-from DA.Modules.opener import Opener
+from da.modules.config_manager import ConfigManager
+from da.modules.version_logic import VersionLogic
+from da.modules.opener import Opener
 
 class ProjectsManager:
     def __init__(self, color="light_blue"):

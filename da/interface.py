@@ -9,9 +9,9 @@ from rich.progress import track
 from rich.console import Console
 from rich.markdown import Markdown
 
-from DA.Modules.projects_manager import ProjectsManager
-from DA.Modules.config_manager import ConfigManager
-from DA.Modules.opener import Opener
+from da.modules.projects_manager import ProjectsManager
+from da.modules.config_manager import ConfigManager
+from da.modules.opener import Opener
 from importlib import resources
 
 class Interface:
@@ -196,7 +196,7 @@ class Interface:
                 time.sleep(2)
 
     def local_init(self):
-        default_files = resources.files("DA.default")
+        default_files = resources.files("da.default")
         dest = self.config.memory_ini
 
         for item in default_files.iterdir():
@@ -207,7 +207,7 @@ class Interface:
         # Add Test-Project
         dest = self.config.projects_folder
         for item in default_files.iterdir():
-            if item.name == "Test-Project.ini":
+            if item.name == "test-project.ini":
                 shutil.copy(item, dest)
 
     def intro(self):
@@ -217,7 +217,7 @@ class Interface:
 
         time.sleep(2)
 
-        readme_content = resources.files("DA").joinpath("intro.md").read_text()
+        readme_content = resources.files("da").joinpath("intro.md").read_text()
 
         MARKDOWN = readme_content
         console = Console()
