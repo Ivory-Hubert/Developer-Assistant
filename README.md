@@ -17,12 +17,12 @@
 ## Appearance
 
 ### Coloured, easy-to-use menus
-![Changelog Menu](Documents/images/changelog-menu.png)
+![Changelog Menu](documents/images/changelog-menu.png)
 
 ### Beautiful changelog previews
 Preview your Markdown changelogs directly in the terminal with Rich rendering:
 
-![Changelog Preview](Documents/images/md-preview.png)
+![Changelog Preview](documents/images/md-preview.png)
 
 
 ## Introduction
