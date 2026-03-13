@@ -4,6 +4,28 @@ All notable changes to Developer-Assistant will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
+## [0.2.5] - 2026-03-13
+
+### Fixed
+- **Writing changelogs to faulty project paths**
+
+Removed a grand feature I discovered, the program wrote new changelogs to non-existing paths.
+
+- **Misconfigured entry point and recursion**
+
+Interface() now uses a proper run() function, also intro() won't call menu() after it finishes.
+
+### Changed
+- **Performance and efficiency updates**
+
+Before this update every class had its own copy of ConfigManager() for `memory.ini`, and that's a problem, so now `memory.ini` is shared between classes. Also removed useless self. prefixes from some variables that didn't need them.
+
+### Added
+- **New indications about the project you're editing**
+
+In the `Add changes` menu you can now see what project you're editing, and once you head to save changes you can see the last version number as you're promted for the new one.
+
+
 ## [0.2.0] - 2026-03-10
 
 ### Fixed

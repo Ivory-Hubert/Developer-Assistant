@@ -14,8 +14,8 @@ from da.modules.config_manager import ConfigManager
 from da.modules.opener import Opener
 
 class VersionLogic:
-    def __init__(self, color="light_blue"):
-        self.config = ConfigManager('memory.ini')
+    def __init__(self, config, color="light_blue"):
+        self.config = config
         self.memory = self.config.load_memory()
         self.color = self.memory.get('color') or color
         
@@ -27,9 +27,7 @@ class VersionLogic:
     def project_menu(self, project):
         self.active_project = project
 
-        self.load_manager = ConfigManager(f"{project}.ini")
-        self.setting = self.load_manager.load_project()
-        self.changelog_path = Path(self.setting.get('changelog'))
+        load_manager = ConfigManager(f"{project}.ini")
 
         now = datetime.now()
         self.today = now.strftime("%Y-%m-%d")
@@ -38,13 +36,18 @@ class VersionLogic:
         self.templog_path = ROOT / "CHANGELOG.tmp"
 
         while True:
+            self.setting = load_manager.load_project()
+            self.changelog_path = Path(self.setting.get('changelog'))
+            self.prj_ver = self.setting.get('version')
+            prj_path = Path(self.setting.get('path'))
+
             os.system(self.clear_screen)
             print("Main menu / Projects / Project menu / Changelog")
             print(self.header.center(127, "="))
             print("E. Back\n")
             print(colored("Chosen project:", attrs=["underline"]))
             print(colored(self.active_project, f"{self.color}"))
-            print("Version: " + colored(self.setting.get('version'), f"{self.color}"))
+            print("Version: " + colored(self.prj_ver, f"{self.color}"))
             print("\n1. Create a new changelog")
             print("2. Add new changes")
             print("3. Open the changelog")
@@ -56,10 +59,13 @@ class VersionLogic:
                 return
 
             elif choice == "1":
-                self.create_changelog()
+                if not os.path.exists(prj_path):
+                    print(colored("\nSystem cannot find the path to this project.", "light_red"))
+                    time.sleep(2)
+                else:
+                    self.create_changelog()
 
             elif choice == "2":
-                #==Check if the file path exists==
                 if not os.path.exists(self.changelog_path):
                     print(colored("\nSystem cannot find the changelog path.", "light_red"))
                     time.sleep(1.5)
@@ -70,7 +76,6 @@ class VersionLogic:
                 Opener.open(self.changelog_path)
 
             elif choice == "4":
-                #==Check if the file path exists==
                 if not os.path.exists(self.changelog_path):
                     print(colored("\nSystem cannot find the changelog path.", "light_red"))
                     time.sleep(1.5)
@@ -80,14 +85,18 @@ class VersionLogic:
             else:
                 print("")
                 print(colored("Unknown option...", "light_red", attrs=["blink"]))
-                time.sleep(2)
+                time.sleep(1)
             
     def create_changelog(self):
         os.system(self.clear_screen)
         print(self.header.center(127, "="))
         print("E. Back/abort\n")
 
-        version = input("Version: ")
+        if os.path.exists(self.changelog_path):
+            print(colored("This action will overwrite your existing changelog!\n", "yellow"))
+            input("Acknowledge..." + colored("[Enter]", f"{self.color}"))
+
+        version = input("\nVersion: ")
         if version.lower() == "e":
             return
         change_type = input("\nChange type: ")
@@ -112,9 +121,16 @@ class VersionLogic:
 
         rendered = self.template_renderer(template, data)
 
-        mode = "a" if os.path.exists(self.changelog_path) else "w"
-        with open(self.changelog_path, mode, encoding="utf-8") as f:
+        with open(self.changelog_path, "w", encoding="utf-8") as f:
             f.write(rendered + "\n")
+
+        new_config = ConfigManager(f"{self.active_project}.ini")
+        new_config.update_project("version", version)
+
+        last_project = self.memory.get('last_project')
+        if last_project != self.active_project:
+            self.config.update_memory("ITEMS", "last_project", self.active_project)
+
         return
 
     def update_changelog(self):
@@ -128,7 +144,11 @@ class VersionLogic:
             print("E. Back/abort")
             print("O. Open templog for fixes.")
             print("S. Review changes & save\n")
-            print("Version: " + colored(self.setting.get('version'), f"{self.color}"))
+
+            print(colored("Chosen project:", attrs=["underline"]))
+            print(colored(self.active_project, f"{self.color}"))
+            print("Version: " + colored(self.prj_ver, f"{self.color}"))
+
             print(colored("\nChoose the change type:", f"{self.color}"))
             print("1. Added")
             print("2. Removed")
@@ -172,7 +192,7 @@ class VersionLogic:
             else:
                 print("")
                 print(colored("Unknown option...", "light_red", attrs=["blink"]))
-                time.sleep(2)
+                time.sleep(1)
 
     def prepend_changes(self):
         header = f"### {self.change_type}"
@@ -222,19 +242,20 @@ class VersionLogic:
         if os.path.exists(self.templog_path):
             with open(self.templog_path, "r", encoding="utf-8") as f:
                 templog_content = f.read()
-            print(colored(f"[version] - {self.today}\n", "magenta", attrs=["underline"]))
+            print(colored(f"[New version] - {self.today}\n", "magenta", attrs=["underline"]))
             MARKDOWN = templog_content
             console = Console()
             md = Markdown(MARKDOWN)
             console.print(md)
         else:
             print(colored("No changes added.", "light_red"))
-            time.sleep(2)
+            time.sleep(1)
             return
         choice = input("\nContinue" + colored("[Enter]", f"{self.color}") + " or go back" + colored("[E] ", f"{self.color}"))
         if choice.lower() == "e":
             return
 
+        print("\nCurrent version: " + colored(self.prj_ver, f"{self.color}"))
         version = input("\nNew version number: ").strip()
 
         print("\nWorking...")
@@ -270,9 +291,8 @@ class VersionLogic:
 
         os.remove(self.templog_path)
 
-        #==Update ini files==
-        config = ConfigManager(f"{self.active_project}.ini")
-        config.update_project("version", version)
+        new_config = ConfigManager(f"{self.active_project}.ini")
+        new_config.update_project("version", version)
 
         last_project = self.memory.get('last_project')
         if last_project != self.active_project:

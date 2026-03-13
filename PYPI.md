@@ -11,6 +11,10 @@
 
 > **Tip:** Once setup is complete and you start the program, an intro with all the necessary information will be displayed for you in the terminal.
 
+> **Linux note:**
+> Avoid using `sudo pip install` because it installs into the system Python.
+If you want a system‑wide install, use the uv method or use `pip install --user`
+
 ## Updating DA
 Two possibilities, depending on how you installed.
 
@@ -37,11 +41,11 @@ Don't change the folder structure or modify variable names inside `.ini` files.
 
 **The user's data (`Templates/`, `Projects/`, `memory.ini`) is stored in standard locations:**
 
-Windows: `C:\Users\...\AppData\Roaming\da-ui\`
+* Windows: `C:\Users\...\AppData\Roaming\da-ui\`
 
-Linux: `~/.config/da-ui/`
+* Linux: `~/.config/da-ui/`
 
-macOS: `~/Library/Application Support/da-ui/`
+* macOS: `~/Library/Application Support/da-ui/`
 
 The `da-ui/` folder will be created automatically.
 
@@ -70,19 +74,19 @@ You can access files/folders and configuration straight from the menus, so you s
 
 The `memory.ini` file does exactly what you'd expect, it features:
 
-> Last project
+* Last project
 
-> Pinned projects
+* Pinned projects
 
-> Custom colour
+* Custom colour
 
 Last project gets updated automatically, the rest are up to you.
 
 - *`Ctrl+C` works everywhere to quickly exit DA.*
 
 ### Setting up your first project
-For a dummy changelog to experiment with, navigate to `Main menu / Projects`, choose `Test-Project`, then choose option `4.` to start adjusting this projects paths. 
+For a dummy changelog to experiment with, navigate to `Main menu / Projects`, choose `test-project`, then choose option `4.` to start adjusting this projects paths. 
 
-Now make an optional `Test-Project/` folder with a `CHANGELOG.md` in it anywhere on your system and point the `.ini` file to it.
+Now make an optional `test-project/` folder with a `CHANGELOG.md` in it anywhere on your system and point the `.ini` file to it.
 
 Once configured, you can create as many changelog entries as you want by picking that project in the menu.

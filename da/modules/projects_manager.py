@@ -10,11 +10,8 @@ from da.modules.version_logic import VersionLogic
 from da.modules.opener import Opener
 
 class ProjectsManager:
-    def __init__(self, color="light_blue"):
-        os.system('title Developer Assistant')
-        self.version = "1.0.0-alpha"
-        
-        self.config = ConfigManager('memory.ini')
+    def __init__(self, config, color="light_blue"):
+        self.config = config
         self.memory = self.config.load_memory()
         self.color = self.memory.get('color') or color
         
@@ -50,15 +47,14 @@ class ProjectsManager:
             return
             
         elif confirm.lower() == "y":
-            self.new_manager = ConfigManager(f"{name}.ini")
-            self.new_manager.data = {
+            new_manager = ConfigManager(f"{name}.ini")
+            new_manager.data = {
                 "path": path,
                 "changelog": changelog,
                 "version": version,
                 "cloud": cloud
             }
-            self.new_manager.project_ini()
-
+            new_manager.project_ini()
             return
             
         else:
@@ -68,26 +64,24 @@ class ProjectsManager:
             return
             
     def load_project(self, project):
+        version_logic = VersionLogic(config=self.config)
+        project_ini_path = self.config.projects_folder / f"{project}.ini"
+        load_manager = ConfigManager(f"{project}.ini")
+
         while True:
-            chosen_project = f"{project}"
-            self.load_manager = ConfigManager(f"{project}.ini")
             try:
-                self.setting = self.load_manager.load_project()
+                setting = load_manager.load_project()
             except KeyError:
-                print(colored(f"\nCan't find {chosen_project}.ini", "light_red"))
+                print(colored(f"\nCan't find {project}.ini", "light_red"))
                 time.sleep(2)
                 return
-
-            self.version_logic = VersionLogic()
-
-            project_ini_path = self.load_manager.projects_folder / f"{chosen_project}.ini"
 
             os.system(self.clear_screen)
             print("Main menu / Projects / Project menu")
             print(self.header.center(127, "="))
             print("E. Back\n")
             print(colored("Chosen project:", attrs=["underline"]))
-            print(colored(chosen_project, f"{self.color}"))
+            print(colored(project, f"{self.color}"))
             print("\n1. Open project folder.")
             print("2. Update the changelog.")
             print("3. Backup to the cloud. [WIP]")
@@ -99,14 +93,14 @@ class ProjectsManager:
                 return
 
             elif choice == "1":
-                path = self.setting.get('path')
+                path = setting.get('path')
                 folder = Path(path)
                 Opener.open(folder)
 
             elif choice == "2":
-                self.version_logic.project_menu(chosen_project)
+                version_logic.project_menu(project)
 
-            # elif choice == "3":
+            #elif choice == "3":
 
             elif choice == "4":
                 Opener.open(project_ini_path)
@@ -114,7 +108,7 @@ class ProjectsManager:
             else:
                 print("")
                 print(colored("Unknown option...", "light_red", attrs=["blink"]))
-                time.sleep(2)
+                time.sleep(1)
         
 if __name__ == "__main__":
     ProjectsManager()

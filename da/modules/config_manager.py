@@ -22,42 +22,13 @@ class ConfigManager:
         self.templates_folder = self.global_dir / "Templates"
         self.new_project_ini = self.projects_folder / config_file
 
-        self.migrate_old_data()
+        self.data_check()
 
         #==Update last_project in memory.ini==
         self.update_last_project = Path(config_file).stem
 
-        self.config.read(self.memory_ini)
-
-    def migrate_old_data(self):
-        old_memory = self.internal_dir / "memory.ini"
-        old_projects = self.internal_dir / "Projects"
-
-        if old_memory.exists() and not self.memory_ini.exists():
-            shutil.move(str(old_memory), str(self.memory_ini))
-            print(f"Migrated memory.ini to {self.global_dir}")
-            time.sleep(2)
-
-        if old_projects.exists() and not self.projects_folder.exists():
-            shutil.move(str(old_projects), str(self.projects_folder))
-            print(f"Migrated Projects folder to {self.global_dir}")
-            time.sleep(2)
-
-        if not self.templates_folder.exists():
-            default_templates = resources.files("da.templates")
-            user_templates = self.templates_folder
-
-            user_templates.mkdir(parents=True, exist_ok=True)
-
-            for item in default_templates.iterdir():
-                dest = user_templates / item.name
-                if not dest.exists():
-                    shutil.copy(item, dest)
-
-            print(f"Copied default Templates to {self.global_dir}")
-            time.sleep(2)
-
     def load_memory(self):
+        self.config.read(self.memory_ini)
         prj = self.config['ITEMS']
         return {
             'last_project': prj.get('last_project'),
@@ -97,14 +68,7 @@ class ConfigManager:
         #==Return project ini variables==
         project_parser = configparser.ConfigParser()
         project_parser.read(self.new_project_ini)
-        '''
-        try:
-            prj = project_parser['SETTINGS']
-        except KeyError:
-            print(f"\nCan't find {self.new_project_ini}")
-            time.sleep(2)
-            return
-        '''
+
         prj = project_parser['SETTINGS']
         return {
             'path': prj.get('path'),
@@ -121,6 +85,34 @@ class ConfigManager:
         with open(self.new_project_ini, "w", encoding="utf-8") as f:
             project_parser.write(f)
         return
+
+    def data_check(self):
+        old_memory = self.internal_dir / "memory.ini"
+        old_projects = self.internal_dir / "Projects"
+
+        if old_memory.exists() and not self.memory_ini.exists():
+            shutil.move(str(old_memory), str(self.memory_ini))
+            print(f"Migrated memory.ini to {self.global_dir}")
+            time.sleep(2)
+
+        if old_projects.exists() and not self.projects_folder.exists():
+            shutil.move(str(old_projects), str(self.projects_folder))
+            print(f"Migrated Projects folder to {self.global_dir}")
+            time.sleep(2)
+
+        if not self.templates_folder.exists():
+            default_templates = resources.files("da.templates")
+            user_templates = self.templates_folder
+
+            user_templates.mkdir(parents=True, exist_ok=True)
+
+            for item in default_templates.iterdir():
+                dest = user_templates / item.name
+                if not dest.exists():
+                    shutil.copy(item, dest)
+
+            print(f"Copied default Templates to {self.global_dir}")
+            time.sleep(2)
 
 if __name__ == "__main__":
     ConfigManager()

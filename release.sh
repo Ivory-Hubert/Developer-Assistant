@@ -21,7 +21,7 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 1
 fi
 
-echo "Running tests..."
+# echo "Running tests..."
 # uv run pytest
 
 echo "Building package..."
@@ -40,4 +40,4 @@ echo "Tagging version v$VERSION in Git..."
 git tag -a "v$VERSION" -m "Release version $VERSION"
 git push origin "v$VERSION"
 
-echo "✅ Successfully released $VERSION!"
+echo "✅ Successfully released v$VERSION!"

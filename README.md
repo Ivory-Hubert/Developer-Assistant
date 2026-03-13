@@ -17,12 +17,12 @@
 ## Appearance
 
 ### Coloured, easy-to-use menus
-![Changelog Menu](Documents/images/changelog-menu.png)
+![Changelog Menu](documents/images/changelog-menu.png)
 
 ### Beautiful changelog previews
 Preview your Markdown changelogs directly in the terminal with Rich rendering:
 
-![Changelog Preview](Documents/images/md-preview.png)
+![Changelog Preview](documents/images/md-preview.png)
 
 
 ## Introduction
@@ -89,9 +89,9 @@ Last project gets updated automatically, the rest are up to you.
 
 
 ### Setting up your first project
-For a dummy changelog to experiment with, navigate to `Main menu / Projects`, choose `Test-Project`, then choose option `4.` to start adjusting this projects paths. 
+For a dummy changelog to experiment with, navigate to `Main menu / Projects`, choose `test-project`, then choose option `4.` to start adjusting this projects paths. 
 
-The `Test-Project/` folder is included in the programs root folder for repo clones and is safe to experiment with. If you installed from PyPI just make a `CHANGELOG.md` anywhere and point the `.ini` file to it.
+The `test-project/` folder is included in the programs root folder **for repo clones** and is safe to experiment with. If you installed from PyPI just make a `CHANGELOG.md` anywhere and point the `.ini` file to it.
 
 Once configured, you can create as many changelog entries as you want by picking that project in the menu.
 

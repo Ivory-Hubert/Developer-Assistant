@@ -16,7 +16,7 @@ from importlib import resources
 
 class Interface:
     def __init__(self, color="light_blue"):
-        self.version = "0.2.0"
+        self.version = "0.2.5"
         title = f"DA - {self.version}"
 
         if platform.system() == "Windows":
@@ -26,13 +26,10 @@ class Interface:
 
         self.config = ConfigManager('memory.ini')
 
-        first_run = False
+        self.first_run = False
         if not self.config.memory_ini.exists():
             self.local_init()
-            self.config = ConfigManager('memory.ini')
-            first_run = True
-
-        self.projects_manager = ProjectsManager()
+            self.first_run = True
 
         self.memory = self.config.load_memory()
         self.color = self.memory.get('color') or color
@@ -41,13 +38,8 @@ class Interface:
         self.header = (colored(" Developer Assistant ", f"{self.color}"))
         self.clear_screen = 'cls' if platform.system() == 'Windows' else 'clear'
         self.user_path = os.environ.get('USERPROFILE') or os.environ.get('HOME', 'User')
-        
-        if first_run:
-            self.intro()
-
-        self.load()
     
-    def load(self):
+    def run(self):
         temp_log = Path(__file__).parent / "CHANGELOG.tmp"
 
         if os.path.exists(temp_log):
@@ -76,8 +68,18 @@ class Interface:
         for i in track(range(20)):
             time.sleep(0.10)
         
-        self.menu()
-        
+        state = "intro" if self.first_run else "menu"
+
+        while state != "exit":
+            if state == "intro":
+                self.intro()
+                state = "menu"
+
+            elif state == "menu":
+                result = self.menu()
+                if result == "exit":
+                    state = "exit"
+
     def menu(self):
         while True:
             os.system(self.clear_screen)
@@ -93,8 +95,8 @@ class Interface:
                 os.system(self.clear_screen)
                 print(self.header.center(127, "="))
                 print("Bye!")
-                time.sleep(2)
-                raise SystemExit
+                time.sleep(1)
+                return "exit"
 
             elif choice == "1":
                 self.projects()
@@ -104,12 +106,12 @@ class Interface:
             else:
                 print("")
                 print(colored("Unknown option...", "light_red", attrs=["blink"]))
-                time.sleep(2)
+                time.sleep(1)
         
     def projects(self):
-        config = ConfigManager('memory.ini')
-        self.memory = config.load_memory()
+        projects_manager = ProjectsManager(config=self.config)
         while True:
+            self.memory = self.config.load_memory()
             os.system(self.clear_screen)
             print("Main menu / Projects")
             print(self.header.center(127, "="))
@@ -135,10 +137,10 @@ class Interface:
                     print(colored("\nLast project has not been defined...", "light_red", attrs=["blink"]))
                     time.sleep(2)
                 else:
-                    self.projects_manager.load_project(f"{project}")
+                    projects_manager.load_project(f"{project}")
 
             elif choice == "2":
-                self.projects_manager.new_project()
+                projects_manager.new_project()
 
             elif choice.lower() in ("a", "b", "c"):
                 #==If the pinned project is empty, return an error message==
@@ -155,12 +157,12 @@ class Interface:
                     time.sleep(2)
                 else:
                     project = self.memory.get(key)
-                    self.projects_manager.load_project(f"{project}")
+                    projects_manager.load_project(f"{project}")
 
             else:
                 print("")
                 print(colored("Unknown option...", "light_red", attrs=["blink"]))
-                time.sleep(2)
+                time.sleep(1)
     
     def settings(self):
         while True:
@@ -180,10 +182,10 @@ class Interface:
 
             if choice.lower() == "e":
                 return
-            elif choice == "1":
-                pass
-            elif choice == "2":
-                pass
+            #elif choice == "1":
+                #pass
+            #elif choice == "2":
+                #pass
             elif choice == "3":
                 Opener.open(self.config.memory_ini)
             elif choice == "4":
@@ -193,7 +195,7 @@ class Interface:
             else:
                 print("")
                 print(colored("Unknown option...", "light_red", attrs=["blink"]))
-                time.sleep(2)
+                time.sleep(1)
 
     def local_init(self):
         default_files = resources.files("da.default")
@@ -213,7 +215,7 @@ class Interface:
     def intro(self):
         os.system(self.clear_screen)
         print(colored("Welcome to the Developer Assistant\n", f"{self.color}", attrs=["bold"]))
-        print("Here's everything you need to get started:\n")
+        print("Here's everything you need to get started...\n")
 
         time.sleep(2)
 
@@ -226,15 +228,13 @@ class Interface:
 
         input("\nContinue..." + colored("[Enter]", f"{self.color}"))
 
-        self.menu()
-
 def main():
     try:
         app = Interface()
         app.run()
     except KeyboardInterrupt:
-        print("\n\n" + colored("Execution interrupted by the user. Exiting...", "magenta", attrs=["bold"]))
-        time.sleep(2)
+        print("\n\n" + colored("Execution interrupted. Exiting...", "magenta", attrs=["bold"]))
+        time.sleep(1)
         sys.exit(0)
 
 if __name__ == "__main__":

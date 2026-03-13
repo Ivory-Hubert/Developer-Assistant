@@ -3,12 +3,13 @@
 ## Introduction
 
 ### Setting up your first project
-For a dummy changelog to experiment with, navigate to `Main menu / Projects`, choose `Test-Project`, then choose option `4.` to start adjusting this projects paths. 
+For a dummy changelog to experiment with, navigate to `Main menu / Projects`, choose `test-project`, then choose option `4.` to start adjusting this projects paths. 
 
-The `Test-Project/` folder is included in the programs root folder for repo clones and is safe to experiment with. If you installed from an URL just make a `CHANGELOG.md` anywhere and point the `.ini` file to it.
+The `test-project/` folder is included in the programs root folder **for repo clones** and is safe to experiment with. If you installed from PyPI just make a `CHANGELOG.md` anywhere and point the `.ini` file to it.
 
 Once configured, you can create as many changelog entries as you want by picking that project in the menu.
 
+> *Tip:*
 > *This quick guide is also at the end of the README for future reference*
 
 ### Using the program.
@@ -20,11 +21,11 @@ Don't change the folder structure or modify variable names inside `.ini` files.
 
 **Your user data (`Templates/`, `Projects/`, `memory.ini`) is stored in standard locations:**
 
-Windows: `C:\Users\...\AppData\Roaming\da-ui\`
+* Windows: `C:\Users\...\AppData\Roaming\da-ui\`
 
-Linux: `~/.config/da-ui/`
+* Linux: `~/.config/da-ui/`
 
-macOS: `~/Library/Application Support/da-ui/`
+* macOS: `~/Library/Application Support/da-ui/`
 
 **The `da-ui/` folder has been created automatically. Updates won't overwrite it, only you can default it.
 You can access its content quickly when going to: `Main menu / Settings`**
@@ -51,11 +52,11 @@ You can access files/folders and configuration straight from the menus, so you s
 
 The `memory.ini` file does exactly what you'd expect, it features:
 
-> Last project
+* Last project
 
-> Pinned projects
+* Pinned projects
 
-> Custom colour
+* Custom colour
 
 Last project gets updated automatically, the rest are up to you.
 
