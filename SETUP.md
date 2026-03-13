@@ -63,7 +63,7 @@ nano ~/.local/bin/da-ui
 cd /home/.../.../Developer-Assistant && uv run -m da.interface
 ```
 
-3. **Make the script excecutable:**
+3. **Make the script executable:**
 ```bash
 chmod +x ~/.local/bin/da-ui
 ```
