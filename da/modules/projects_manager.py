@@ -1,27 +1,27 @@
 import os, sys
 import time
-from termcolor import colored
 import subprocess
 import platform
 from pathlib import Path
+
+from termcolor import colored
 
 from da.modules.config_manager import ConfigManager
 from da.modules.version_logic import VersionLogic
 from da.modules.opener import Opener
 
 class ProjectsManager:
-    def __init__(self, config, color="light_blue"):
+    def __init__(self, config, color, header, cls, user_path):
         self.config = config
+        self.color = color
+        self.header = header
+        self.cls = cls
+        self.user_path = user_path
+
         self.memory = self.config.load_memory()
-        self.color = self.memory.get('color') or color
-        
-        #==Reusables==
-        self.header = (colored(" Developer Assistant ", f"{self.color}"))
-        self.clear_screen = 'cls' if platform.system() == 'Windows' else 'clear'
-        self.user_path = os.environ.get('USERPROFILE') or os.environ.get('HOME', 'User')
     
     def new_project(self):
-        os.system(self.clear_screen)
+        os.system(self.cls)
         print(self.header.center(127, "="))
         print("E. Abort/back\n")
         
@@ -64,7 +64,13 @@ class ProjectsManager:
             return
             
     def load_project(self, project):
-        version_logic = VersionLogic(config=self.config)
+        version_logic = VersionLogic(
+            config=self.config,
+            color=self.color,
+            header=self.header,
+            cls=self.cls,
+            user_path=self.user_path
+        )
         project_ini_path = self.config.projects_folder / f"{project}.ini"
         load_manager = ConfigManager(f"{project}.ini")
 
@@ -76,16 +82,17 @@ class ProjectsManager:
                 time.sleep(2)
                 return
 
-            os.system(self.clear_screen)
+            os.system(self.cls)
             print("Main menu / Projects / Project menu")
             print(self.header.center(127, "="))
             print("E. Back\n")
             print(colored("Chosen project:", attrs=["underline"]))
             print(colored(project, f"{self.color}"))
             print("\n1. Open project folder.")
-            print("2. Update the changelog.")
+            print("2. Manage the changelog.")
             print("3. Backup to the cloud. [WIP]")
-            print("4. Open project configurations.\n")
+            print("4. Open project configurations.")
+            print("5. Restore backup changelog.\n")
 
             choice = input(f"{self.user_path}> ").strip()
 
@@ -105,10 +112,31 @@ class ProjectsManager:
             elif choice == "4":
                 Opener.open(project_ini_path)
 
+            elif choice == "5":
+                changelog = Path(setting.get('changelog'))
+                if os.path.exists(changelog):
+                    print(colored("\nThis action will overwrite your existing changelog!\n", "yellow"))
+                    input("Acknowledge..." + colored("[Enter]", f"{self.color}"))
+                self.rest_bak(setting, project)
+
             else:
                 print("")
                 print(colored("Unknown option...", "light_red", attrs=["blink"]))
                 time.sleep(1)
+
+    def rest_bak(self, setting, project):
+        prj_path = Path(setting.get('path'))
+        has_bak = any(prj_path.glob("*.bak"))
+
+        if not has_bak:
+            print(colored(f"\nCan't find any .bak files for {project}", "yellow"))
+            time.sleep(2)
+
+        else:
+            for bak in prj_path.glob("*.bak"):
+                bak.rename(prj_path / "CHANGELOG.md")
+                print(f"\nRenamed {bak} to CHANGELOG.md")
+            time.sleep(1)
         
 if __name__ == "__main__":
     ProjectsManager()

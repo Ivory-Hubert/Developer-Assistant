@@ -5,6 +5,7 @@ import platform
 import shutil
 from datetime import datetime
 from pathlib import Path
+
 from termcolor import colored
 from prompt_toolkit import prompt
 from rich.console import Console
@@ -14,15 +15,14 @@ from da.modules.config_manager import ConfigManager
 from da.modules.opener import Opener
 
 class VersionLogic:
-    def __init__(self, config, color="light_blue"):
+    def __init__(self, config, color, header, cls, user_path):
         self.config = config
+        self.color = color
+        self.header = header
+        self.cls = cls
+        self.user_path = user_path
+
         self.memory = self.config.load_memory()
-        self.color = self.memory.get('color') or color
-        
-        #==Reusables==
-        self.header = (colored(" Developer Assistant ", f"{self.color}"))
-        self.clear_screen = 'cls' if platform.system() == 'Windows' else 'clear'
-        self.user_path = os.environ.get('USERPROFILE') or os.environ.get('HOME', 'User')
     
     def project_menu(self, project):
         self.active_project = project
@@ -41,7 +41,7 @@ class VersionLogic:
             self.prj_ver = self.setting.get('version')
             prj_path = Path(self.setting.get('path'))
 
-            os.system(self.clear_screen)
+            os.system(self.cls)
             print("Main menu / Projects / Project menu / Changelog")
             print(self.header.center(127, "="))
             print("E. Back\n")
@@ -61,7 +61,7 @@ class VersionLogic:
             elif choice == "1":
                 if not os.path.exists(prj_path):
                     print(colored("\nSystem cannot find the path to this project.", "light_red"))
-                    time.sleep(2)
+                    time.sleep(1.5)
                 else:
                     self.create_changelog()
 
@@ -88,7 +88,7 @@ class VersionLogic:
                 time.sleep(1)
             
     def create_changelog(self):
-        os.system(self.clear_screen)
+        os.system(self.cls)
         print(self.header.center(127, "="))
         print("E. Back/abort\n")
 
@@ -138,8 +138,8 @@ class VersionLogic:
         self.change = None
         self.comment = None
         while True:
-            os.system(self.clear_screen)
-            print("Main menu / Projects / Project menu / Changelogs / Add changes")
+            os.system(self.cls)
+            print("Main menu / Projects / Project menu / Changelog / Add changes")
             print(self.header.center(127, "="))
             print("E. Back/abort")
             print("O. Open templog for fixes.")
@@ -169,12 +169,12 @@ class VersionLogic:
 
             #==Assign change types to keys==
             type_map = {
-            "1": "Added",
-            "2": "Removed",
-            "3": "Fixed",
-            "4": "Changed",
-            "5": "Deprecated",
-            "6": "Security"
+                "1": "Added",
+                "2": "Removed",
+                "3": "Fixed",
+                "4": "Changed",
+                "5": "Deprecated",
+                "6": "Security"
             }
 
             self.change_type = type_map.get(type_choice.lower())
@@ -208,7 +208,7 @@ class VersionLogic:
                 f.write(header + "\n")
 
         while True:
-            os.system(self.clear_screen)
+            os.system(self.cls)
             print(self.header.center(127, "="))
 
             print("Chosen change type:")
@@ -235,14 +235,17 @@ class VersionLogic:
                 return
 
     def save_changes(self):
-        os.system(self.clear_screen)
+        os.system(self.cls)
         print(self.header.center(127, "="))
         print(colored("Please check the output file:", f"{self.color}", attrs=["underline"]))
+
         templog_content = ""
         if os.path.exists(self.templog_path):
             with open(self.templog_path, "r", encoding="utf-8") as f:
                 templog_content = f.read()
+
             print(colored(f"[New version] - {self.today}\n", "magenta", attrs=["underline"]))
+
             MARKDOWN = templog_content
             console = Console()
             md = Markdown(MARKDOWN)
@@ -251,7 +254,9 @@ class VersionLogic:
             print(colored("No changes added.", "light_red"))
             time.sleep(1)
             return
+
         choice = input("\nContinue" + colored("[Enter]", f"{self.color}") + " or go back" + colored("[E] ", f"{self.color}"))
+
         if choice.lower() == "e":
             return
 
@@ -261,8 +266,8 @@ class VersionLogic:
         print("\nWorking...")
 
         header_data = {
-        "version": version,
-        "date": self.today
+            "version": version,
+            "date": self.today
         }
 
         header_template = self.template_loader("header_template.txt")
@@ -271,7 +276,7 @@ class VersionLogic:
         old_content = ""
         if os.path.exists(self.changelog_path):
             #==Make a duplicate of the old changelog==
-            log_name = f"Changelog-{self.today}.md"
+            log_name = f"Changelog-{self.today}.bak"
             project_folder = Path(self.setting.get('path'))
             duplicate_path = project_folder / log_name
 
@@ -303,7 +308,7 @@ class VersionLogic:
         return
 
     def view_md(self, log_path):
-        os.system(self.clear_screen)
+        os.system(self.cls)
         print(self.header.center(127, "="))
         print("")
 

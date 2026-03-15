@@ -10,7 +10,7 @@ class Opener:
         #==Check if path exists==
         if not os.path.exists(path):
             print(colored("\nThis path does not exist.", "light_red"))
-            time.sleep(1.5)
+            time.sleep(1)
             return
         #==Open if exists==
         else:

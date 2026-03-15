@@ -4,6 +4,7 @@ import platform
 import subprocess
 import shutil
 from pathlib import Path
+
 from termcolor import colored
 from rich.progress import track
 from rich.console import Console
@@ -15,8 +16,10 @@ from da.modules.opener import Opener
 from importlib import resources
 
 class Interface:
-    def __init__(self, color="light_blue"):
-        self.version = "0.2.5"
+    def __init__(self):
+        self.version = "0.2.8"
+        self.cls = 'cls' if platform.system() == 'Windows' else 'clear'
+
         title = f"DA - {self.version}"
 
         if platform.system() == "Windows":
@@ -26,25 +29,34 @@ class Interface:
 
         self.config = ConfigManager('memory.ini')
 
-        self.first_run = False
-        if not self.config.memory_ini.exists():
-            self.local_init()
-            self.first_run = True
+        self.memory = None
+        self.color = None
+        self.header = None
+        self.user_path = None
 
-        self.memory = self.config.load_memory()
-        self.color = self.memory.get('color') or color
-        
-        #==Reusables==
-        self.header = (colored(" Developer Assistant ", f"{self.color}"))
-        self.clear_screen = 'cls' if platform.system() == 'Windows' else 'clear'
-        self.user_path = os.environ.get('USERPROFILE') or os.environ.get('HOME', 'User')
+        self.first_run = False
     
     def run(self):
+        steps = [
+            ("Initializing runtime...", self.runtime_init),
+            ("Checking configuration...", self.config.data_check)
+        ]
+
+        for label, step in track(steps):
+            os.system(self.cls)
+            print(label.center(65))
+            result = step()
+            time.sleep(0.30)
+            if isinstance(result, list):
+                for msg in result:
+                    print(msg.center(65))
+                    time.sleep(2)
+
         temp_log = Path(__file__).parent / "CHANGELOG.tmp"
 
         if os.path.exists(temp_log):
             while True:
-                os.system(self.clear_screen)
+                os.system(self.cls)
                 print(colored(f"Temporary changelog detected in:\n{temp_log}\n", "yellow"))
                 print(colored("D", "light_red") + "elete or " + colored("K", "light_red") + "eep?\n")
                 choice = input(f"{self.user_path}> ").lower()
@@ -56,17 +68,6 @@ class Interface:
                 else:
                     print(colored("\nPlease make a valid choice.", "light_red"))
                     time.sleep(1.5)
-
-        os.system(self.clear_screen)
-        message = (colored("Developer Assistant Ver. ", attrs=["bold"]) + (colored(self.version, f"{self.color}", attrs=["bold"])))
-        status = (colored("Loading, please wait... ", attrs=["blink"]))
-        
-        print(message.center(85))
-        print("")
-        print(status.center(73))
-        
-        for i in track(range(20)):
-            time.sleep(0.10)
         
         state = "intro" if self.first_run else "menu"
 
@@ -82,7 +83,7 @@ class Interface:
 
     def menu(self):
         while True:
-            os.system(self.clear_screen)
+            os.system(self.cls)
             print("Main menu")
             print(self.header.center(127, "="))
             print("\nE. Exit\n")
@@ -92,7 +93,7 @@ class Interface:
             choice = input(f"{self.user_path}> ").strip()
 
             if choice.lower() == "e":
-                os.system(self.clear_screen)
+                os.system(self.cls)
                 print(self.header.center(127, "="))
                 print("Bye!")
                 time.sleep(1)
@@ -109,10 +110,16 @@ class Interface:
                 time.sleep(1)
         
     def projects(self):
-        projects_manager = ProjectsManager(config=self.config)
+        projects_manager = ProjectsManager(
+            config=self.config,
+            color=self.color,
+            header=self.header,
+            cls=self.cls,
+            user_path=self.user_path
+        )
         while True:
             self.memory = self.config.load_memory()
-            os.system(self.clear_screen)
+            os.system(self.cls)
             print("Main menu / Projects")
             print(self.header.center(127, "="))
             print("E. Back\n")
@@ -135,7 +142,7 @@ class Interface:
                 project = self.memory.get('last_project')
                 if not project:
                     print(colored("\nLast project has not been defined...", "light_red", attrs=["blink"]))
-                    time.sleep(2)
+                    time.sleep(1)
                 else:
                     projects_manager.load_project(f"{project}")
 
@@ -154,7 +161,7 @@ class Interface:
                 if project_name == "":
                     print("")
                     print(colored(f"Project '{choice}' has not been defined...", "light_red", attrs=["blink"]))
-                    time.sleep(2)
+                    time.sleep(1)
                 else:
                     project = self.memory.get(key)
                     projects_manager.load_project(f"{project}")
@@ -166,7 +173,7 @@ class Interface:
     
     def settings(self):
         while True:
-            os.system(self.clear_screen)
+            os.system(self.cls)
             print("Main menu / Settings")
             print(self.header.center(127, "="))
             print("E. Back\n")
@@ -197,6 +204,17 @@ class Interface:
                 print(colored("Unknown option...", "light_red", attrs=["blink"]))
                 time.sleep(1)
 
+    def runtime_init(self):
+        if not self.config.memory_ini.exists():
+            self.local_init()
+            self.first_run = True
+
+        self.memory = self.config.load_memory()
+        self.color = self.memory.get('color') or "light_blue"
+
+        self.header = (colored(" Developer Assistant ", f"{self.color}"))
+        self.user_path = os.environ.get('USERPROFILE') or os.environ.get('HOME', 'User')
+
     def local_init(self):
         default_files = resources.files("da.default")
         dest = self.config.memory_ini
@@ -213,7 +231,7 @@ class Interface:
                 shutil.copy(item, dest)
 
     def intro(self):
-        os.system(self.clear_screen)
+        os.system(self.cls)
         print(colored("Welcome to the Developer Assistant\n", f"{self.color}", attrs=["bold"]))
         print("Here's everything you need to get started...\n")
 
@@ -233,7 +251,7 @@ def main():
         app = Interface()
         app.run()
     except KeyboardInterrupt:
-        print("\n\n" + colored("Execution interrupted. Exiting...", "magenta", attrs=["bold"]))
+        print("\n\n" + colored("Execution interrupted. Exiting...", "cyan", attrs=["bold"]))
         time.sleep(1)
         sys.exit(0)
 
