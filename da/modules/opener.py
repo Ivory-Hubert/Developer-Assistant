@@ -1,8 +1,8 @@
-from termcolor import colored
 import subprocess
 import platform
 import os
 import time
+from termcolor import colored
 
 class Opener:
     @staticmethod
@@ -26,6 +26,3 @@ class Opener:
                     stderr=subprocess.DEVNULL
                 )
             return
-
-if __name__ == "__main__":
-    Opener()

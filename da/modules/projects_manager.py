@@ -17,9 +17,63 @@ class ProjectsManager:
         self.header = header
         self.cls = cls
         self.user_path = user_path
-
-        self.memory = self.config.load_memory()
     
+    def projects(self, profile):
+        self.active_profile = profile
+        while True:
+            self.memory = self.config.load_memory()
+            os.system(self.cls)
+            print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Projects")
+            print(self.header.center(127, "="))
+            print("E. Back\n")
+            print(colored("1. Last project:", attrs=["underline"]))
+            print(colored(self.memory.get('last_project'), f"{self.color}"))
+            print("\n2. Start a new project.\n")
+            print(colored("Continue a project.", attrs=["underline"]))
+            print("Pinned:")
+            print("a. " + colored(self.memory.get('pinned_project'), f"{self.color}"))
+            print("b. " + colored(self.memory.get('pinned_project1'), f"{self.color}"))
+            print("c. " + colored(self.memory.get('pinned_project2'), f"{self.color}"))
+
+            print("")
+            choice = input(f"{self.user_path}> ").strip()
+
+            if choice.lower() == "e":
+                return
+
+            elif choice == "1":
+                project = self.memory.get('last_project')
+                if not project:
+                    print(colored("\nLast project has not been defined...", "light_red", attrs=["blink"]))
+                    time.sleep(1)
+                else:
+                    self.load_project(f"{project}")
+
+            elif choice == "2":
+                self.new_project()
+
+            elif choice.lower() in ("a", "b", "c"):
+                #==If the pinned project is empty, return an error message==
+                options_map = {
+                    'a': 'pinned_project',
+                    'b': 'pinned_project1',
+                    'c': 'pinned_project2'
+                }
+                key = options_map.get(choice.lower())
+                project_name = self.memory.get(key)
+                if project_name == "":
+                    print("")
+                    print(colored(f"Project '{choice}' has not been defined...", "light_red", attrs=["blink"]))
+                    time.sleep(1)
+                else:
+                    project = self.memory.get(key)
+                    self.load_project(f"{project}")
+
+            else:
+                print("")
+                print(colored("Unknown option...", "light_red", attrs=["blink"]))
+                time.sleep(1)
+
     def new_project(self):
         os.system(self.cls)
         print(self.header.center(127, "="))
@@ -28,27 +82,22 @@ class ProjectsManager:
         name = input("Enter new project name: ")
         if name.lower() == "e":
             return
+        path = input("\nEnter project path: ")
 
-        print("")
-        path = input("Enter project path: ")
+        changelog = input("\nProject changelog path: ")
 
-        print("")
-        changelog = input("Project changelog path: ")
+        version = input("\nCurrent project version: ")
 
-        print("")
-        version = input("Current project version: ")
+        cloud = input("\nCloud service (OneDrive/Azure/Dropbox/Google Drive): ")
 
-        print("")
-        cloud = input("Cloud service (OneDrive/Azure/Dropbox/Google Drive): ")
-
-        print("")
-        confirm = input("Confirm(Y) or abort(E): ")
+        confirm = input("\nConfirm(Y) or abort(E): ")
         if confirm.lower() == "e":
             return
             
         elif confirm.lower() == "y":
-            new_manager = ConfigManager(f"{name}.ini")
+            new_manager = ConfigManager(f"{name}.ini", profile=self.active_profile)
             new_manager.data = {
+                "owner" : self.active_profile,
                 "path": path,
                 "changelog": changelog,
                 "version": version,
@@ -71,19 +120,20 @@ class ProjectsManager:
             cls=self.cls,
             user_path=self.user_path
         )
-        project_ini_path = self.config.projects_folder / f"{project}.ini"
-        load_manager = ConfigManager(f"{project}.ini")
+
+        load_manager = ConfigManager(f"{project}.ini", profile=self.active_profile)
+        project_ini_path = load_manager.projects_folder / f"{project}.ini"
 
         while True:
             try:
                 setting = load_manager.load_project()
             except KeyError:
                 print(colored(f"\nCan't find {project}.ini", "light_red"))
-                time.sleep(2)
+                time.sleep(1)
                 return
 
             os.system(self.cls)
-            print("Main menu / Projects / Project menu")
+            print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Projects / Project menu")
             print(self.header.center(127, "="))
             print("E. Back\n")
             print(colored("Chosen project:", attrs=["underline"]))
@@ -105,7 +155,7 @@ class ProjectsManager:
                 Opener.open(folder)
 
             elif choice == "2":
-                version_logic.project_menu(project)
+                version_logic.project_menu(project, self.active_profile)
 
             #elif choice == "3":
 
@@ -126,17 +176,18 @@ class ProjectsManager:
 
     def rest_bak(self, setting, project):
         prj_path = Path(setting.get('path'))
-        has_bak = any(prj_path.glob("*.bak"))
+        has_bak = list(prj_path.glob("*.bak"))
 
         if not has_bak:
             print(colored(f"\nCan't find any .bak files for {project}", "yellow"))
             time.sleep(2)
+            return
 
-        else:
-            for bak in prj_path.glob("*.bak"):
-                bak.rename(prj_path / "CHANGELOG.md")
-                print(f"\nRenamed {bak} to CHANGELOG.md")
-            time.sleep(1)
+        bak = has_bak[0]
+        bak.rename(prj_path / "CHANGELOG.md")
+        print(f"\nRenamed {bak.name} to CHANGELOG.md")
+        time.sleep(1)
+        return
         
 if __name__ == "__main__":
-    ProjectsManager()
+    ProjectsManager(config, color, header, cls, user_path)

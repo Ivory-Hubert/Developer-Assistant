@@ -5,6 +5,7 @@ import platform
 import shutil
 from datetime import datetime
 from pathlib import Path
+import tempfile
 
 from termcolor import colored
 from prompt_toolkit import prompt
@@ -24,10 +25,11 @@ class VersionLogic:
 
         self.memory = self.config.load_memory()
     
-    def project_menu(self, project):
+    def project_menu(self, project, profile):
         self.active_project = project
+        self.active_profile = profile
 
-        load_manager = ConfigManager(f"{project}.ini")
+        load_manager = ConfigManager(f"{project}.ini", profile=self.active_profile)
 
         now = datetime.now()
         self.today = now.strftime("%Y-%m-%d")
@@ -42,7 +44,7 @@ class VersionLogic:
             prj_path = Path(self.setting.get('path'))
 
             os.system(self.cls)
-            print("Main menu / Projects / Project menu / Changelog")
+            print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Projects / Project menu / Changelog")
             print(self.header.center(127, "="))
             print("E. Back\n")
             print(colored("Chosen project:", attrs=["underline"]))
@@ -73,7 +75,15 @@ class VersionLogic:
                     self.update_changelog()
 
             elif choice == "3":
-                Opener.open(self.changelog_path)
+                if not os.path.exists(self.changelog_path):
+                    print(colored("\nSystem cannot find the changelog path.", "light_red"))
+                    time.sleep(1.5)
+                    pass
+                else:
+                    if self.check_size():
+                        pass
+                    else:
+                        Opener.open(self.changelog_path)
 
             elif choice == "4":
                 if not os.path.exists(self.changelog_path):
@@ -124,7 +134,7 @@ class VersionLogic:
         with open(self.changelog_path, "w", encoding="utf-8") as f:
             f.write(rendered + "\n")
 
-        new_config = ConfigManager(f"{self.active_project}.ini")
+        new_config = ConfigManager(f"{self.active_project}.ini", profile=self.active_profile)
         new_config.update_project("version", version)
 
         last_project = self.memory.get('last_project')
@@ -134,12 +144,15 @@ class VersionLogic:
         return
 
     def update_changelog(self):
+        if self.check_size():
+            return
+
         self.change_type = None
         self.change = None
         self.comment = None
         while True:
             os.system(self.cls)
-            print("Main menu / Projects / Project menu / Changelog / Add changes")
+            print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Projects / Project menu / Changelog / Add changes")
             print(self.header.center(127, "="))
             print("E. Back/abort")
             print("O. Open templog for fixes.")
@@ -291,12 +304,24 @@ class VersionLogic:
 
         combined = header_rendered + "\n" + templog_content + "\n" + old_content
 
-        with open(self.changelog_path, "w", encoding="utf-8") as f:
-            f.write(combined)
+        log_dir = self.changelog_path.parent
+        fd, temp_path = tempfile.mkstemp(dir=log_dir, text=True)
+
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                f.write(combined)
+                f.flush()
+
+            os.replace(temp_path, self.changelog_path)
+
+        except Exception as e:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            raise e
 
         os.remove(self.templog_path)
 
-        new_config = ConfigManager(f"{self.active_project}.ini")
+        new_config = ConfigManager(f"{self.active_project}.ini", profile=self.active_profile)
         new_config.update_project("version", version)
 
         last_project = self.memory.get('last_project')
@@ -308,6 +333,9 @@ class VersionLogic:
         return
 
     def view_md(self, log_path):
+        if self.check_size():
+            return
+
         os.system(self.cls)
         print(self.header.center(127, "="))
         print("")
@@ -324,6 +352,16 @@ class VersionLogic:
         input("\nReturn..." + colored("[Enter]", f"{self.color}"))
         return
 
+    def check_size(self):
+        MAX_SIZE = 100 * 1024 * 1024
+
+        size = self.changelog_path.stat().st_size
+        size_mb = size / (1024 * 1024)
+        if size > MAX_SIZE:
+            print(colored(f"\nChangelog too large to load safely: {size_mb:.2f} MB", "light_red"))
+            time.sleep(2)
+            return True
+
     def template_loader(self, template_file):
         template_path = self.config.templates_folder / template_file
 
@@ -337,4 +375,4 @@ class VersionLogic:
         return template
 
 if __name__ == "__main__":
-    VersionLogic()
+    VersionLogic(config, color, header, cls, user_path)

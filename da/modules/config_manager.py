@@ -10,16 +10,22 @@ from platformdirs import user_config_path
 from importlib import resources
 
 class ConfigManager:
-    def __init__(self, config_file):
+    def __init__(self, config_file, profile=None):
+        if not profile:
+            profile = "Default"
+
         self.config = configparser.ConfigParser()
         
-        self.internal_dir = Path(__file__).resolve().parents[1]
         self.global_dir = user_config_path("da-ui")
-        self.global_dir.mkdir(parents=True, exist_ok=True)
-        
         self.memory_ini = self.global_dir / 'memory.ini'
-        self.projects_folder = self.global_dir / "Projects"
-        self.templates_folder = self.global_dir / "Templates"
+
+        self.profile_dir = self.global_dir / "Profiles"
+        self.profile_dir.mkdir(parents=True, exist_ok=True)
+
+        custom_profile = self.profile_dir / profile
+
+        self.templates_folder = custom_profile / "Templates"
+        self.projects_folder = custom_profile / "Projects"
         self.new_project_ini = self.projects_folder / config_file
 
         self.update_last_project = Path(config_file).stem
@@ -32,6 +38,7 @@ class ConfigManager:
             'pinned_project': prj.get('pinned_project'),
             'pinned_project1': prj.get('pinned_project1'),
             'pinned_project2': prj.get('pinned_project2'),
+            'profile': self.config.get("CONFIG", "profile"),
             'color': self.config.get("CONFIG", "color")
         }
 
@@ -46,6 +53,8 @@ class ConfigManager:
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as f:
                 memory_parser.write(f)
+                f.flush()
+
             os.replace(temp_path, self.memory_ini)
 
         except Exception as e:
@@ -74,6 +83,7 @@ class ConfigManager:
 
         prj = project_parser['SETTINGS']
         return {
+            'owner' : prj.get('owner', 'Default'),
             'path': prj.get('path'),
             'changelog': prj.get('changelog'),
             'version': prj.get('version'),
@@ -91,6 +101,8 @@ class ConfigManager:
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as f:
                 project_parser.write(f)
+                f.flush()
+
             os.replace(temp_path, self.new_project_ini)
 
         except Exception as e:
@@ -101,8 +113,12 @@ class ConfigManager:
         return
 
     def data_check(self):
-        old_memory = self.internal_dir / "memory.ini"
-        old_projects = self.internal_dir / "Projects"
+        internal_dir = Path(__file__).resolve().parents[1]
+        default_profile = self.profile_dir / "Default"
+        default_profile.mkdir(parents=True, exist_ok=True)
+
+        old_memory = internal_dir / "memory.ini"
+        old_projects = self.global_dir / "Projects"
 
         messages = []
 
@@ -112,7 +128,7 @@ class ConfigManager:
 
         if old_projects.exists() and not self.projects_folder.exists():
             shutil.move(str(old_projects), str(self.projects_folder))
-            messages.append(f"Migrated Projects folder to {self.global_dir}")
+            messages.append(f"Migrated Projects folder to {self.projects_folder}")
 
         if not self.templates_folder.exists():
             default_templates = resources.files("da.templates")
@@ -125,9 +141,9 @@ class ConfigManager:
                 if not dest.exists():
                     shutil.copy(item, dest)
 
-            messages.append(f"Copied default Templates to {self.global_dir}")
+            messages.append(f"Copied default Templates to {self.templates_folder}")
 
         return messages
 
 if __name__ == "__main__":
-    ConfigManager()
+    ConfigManager(config_file, profile="Default")

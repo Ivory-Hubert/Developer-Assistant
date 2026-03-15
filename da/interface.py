@@ -17,7 +17,7 @@ from importlib import resources
 
 class Interface:
     def __init__(self):
-        self.version = "0.2.8"
+        self.version = "0.4.0"
         self.cls = 'cls' if platform.system() == 'Windows' else 'clear'
 
         title = f"DA - {self.version}"
@@ -27,7 +27,7 @@ class Interface:
         else:
             print(f'\33]0;{title}\a', end='', flush=True)
 
-        self.config = ConfigManager('memory.ini')
+        self.config = ConfigManager('memory.ini', profile="Default")
 
         self.memory = None
         self.color = None
@@ -82,13 +82,27 @@ class Interface:
                     state = "exit"
 
     def menu(self):
+        self.active_profile = self.memory.get('profile')
+
+        projects_manager = ProjectsManager(
+            config=self.config,
+            color=self.color,
+            header=self.header,
+            cls=self.cls,
+            user_path=self.user_path
+        )
+
+        last_project = self.memory.get('last_project')
         while True:
             os.system(self.cls)
-            print("Main menu")
+            print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu")
             print(self.header.center(127, "="))
-            print("\nE. Exit\n")
-            print("1. Projects")
-            print("2. Settings\n")
+            print("E. Exit\n")
+            print("Last project:")
+            print(colored(last_project, f"{self.color}"))
+            print("\n1. Projects")
+            print("2. Settings")
+            print("3. Profiles\n")
 
             choice = input(f"{self.user_path}> ").strip()
 
@@ -100,72 +114,13 @@ class Interface:
                 return "exit"
 
             elif choice == "1":
-                self.projects()
+                projects_manager.projects(self.active_profile)
 
             elif choice == "2":
                 self.settings()
-            else:
-                print("")
-                print(colored("Unknown option...", "light_red", attrs=["blink"]))
-                time.sleep(1)
-        
-    def projects(self):
-        projects_manager = ProjectsManager(
-            config=self.config,
-            color=self.color,
-            header=self.header,
-            cls=self.cls,
-            user_path=self.user_path
-        )
-        while True:
-            self.memory = self.config.load_memory()
-            os.system(self.cls)
-            print("Main menu / Projects")
-            print(self.header.center(127, "="))
-            print("E. Back\n")
-            print(colored("1. The last project:", attrs=["underline"]))
-            print(colored(self.memory.get('last_project'), f"{self.color}"))
-            print("\n2. Start a new project.\n")
-            print(colored("Continue a project.", attrs=["underline"]))
-            print("Pinned:")
-            print("a. " + colored(self.memory.get('pinned_project'), f"{self.color}"))
-            print("b. " + colored(self.memory.get('pinned_project1'), f"{self.color}"))
-            print("c. " + colored(self.memory.get('pinned_project2'), f"{self.color}"))
 
-            print("")
-            choice = input(f"{self.user_path}> ").strip()
-
-            if choice.lower() == "e":
-                return
-
-            elif choice == "1":
-                project = self.memory.get('last_project')
-                if not project:
-                    print(colored("\nLast project has not been defined...", "light_red", attrs=["blink"]))
-                    time.sleep(1)
-                else:
-                    projects_manager.load_project(f"{project}")
-
-            elif choice == "2":
-                projects_manager.new_project()
-
-            elif choice.lower() in ("a", "b", "c"):
-                #==If the pinned project is empty, return an error message==
-                options_map = {
-                    'a': 'pinned_project',
-                    'b': 'pinned_project1',
-                    'c': 'pinned_project2'
-                }
-                key = options_map.get(choice.lower())
-                project_name = self.memory.get(key)
-                if project_name == "":
-                    print("")
-                    print(colored(f"Project '{choice}' has not been defined...", "light_red", attrs=["blink"]))
-                    time.sleep(1)
-                else:
-                    project = self.memory.get(key)
-                    projects_manager.load_project(f"{project}")
-
+            elif choice == "3":
+                self.profiles()
             else:
                 print("")
                 print(colored("Unknown option...", "light_red", attrs=["blink"]))
@@ -174,12 +129,14 @@ class Interface:
     def settings(self):
         while True:
             os.system(self.cls)
-            print("Main menu / Settings")
+            print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Settings")
             print(self.header.center(127, "="))
             print("E. Back\n")
+
             print(colored("Configuration options", attrs=["underline"]))
             print("1. Edit pinned projects [WIP]")
             print("2. Change program's color [WIP]\n")
+
             print(colored("Other options", attrs=["underline"]))
             print("3. Open memory.ini manually")
             print("4. Open the Projects folder")
@@ -204,14 +161,93 @@ class Interface:
                 print(colored("Unknown option...", "light_red", attrs=["blink"]))
                 time.sleep(1)
 
+    def profiles(self):
+        while True:
+            os.system(self.cls)
+            print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Profiles")
+            print(self.header.center(127, "="))
+            print("E. Back\n")
+
+            print("1. Create a new profile")
+            print("2. Switch profiles\n")
+
+            choice = input(f"{self.user_path}> ").strip()
+
+            if choice.lower() == "e":
+                return
+            elif choice == "1":
+                self.new_profile()
+            elif choice == "2":
+                self.switch_profile()
+            else:
+                print("")
+                print(colored("Unknown option...", "light_red", attrs=["blink"]))
+                time.sleep(1)
+
+    def switch_profile(self):
+        while True:
+            prof_dir = self.config.profile_dir
+            contents = os.listdir(prof_dir)
+
+            print("\Your profiles:")
+            for item in contents:
+                print(colored(f" - {item}", f"{self.color}"))
+
+            name = input("\nType profile name: ")
+
+            if name in contents:
+                self.config.update_memory("CONFIG", "profile", name)
+
+                self.memory = self.config.load_memory()
+
+                profile = self.memory.get('profile')
+                self.config = ConfigManager("memory.ini", profile=profile)
+
+                self.memory = self.config.load_memory()
+                self.active_profile = self.memory.get('profile')
+                return
+            else:
+                print(colored("\nInvalid name!", "yellow"))
+                time.sleep(1)
+                os.system(self.cls)
+
+    def new_profile(self):
+        name = input("\nNew profile name: ")
+
+        profile_dir = self.config.profile_dir / name
+        profile_dir.mkdir(parents=True, exist_ok=True)
+
+        (profile_dir / "Projects").mkdir(exist_ok=True)
+        (profile_dir / "Templates").mkdir(exist_ok=True)
+
+        default_templates = resources.files("da.templates")
+        for item in default_templates.iterdir():
+            dest = profile_dir / "Templates"
+            shutil.copy(item, dest)
+
+        self.config.update_memory("CONFIG", "profile", name)
+
+        self.memory = self.config.load_memory()
+
+        profile = self.memory.get('profile')
+        self.config = ConfigManager("memory.ini", pactive_profile)
+
+        self.memory = self.config.load_memory()
+        self.active_profile = self.memory.get('profile')
+        return
+
     def runtime_init(self):
         if not self.config.memory_ini.exists():
             self.local_init()
             self.first_run = True
 
         self.memory = self.config.load_memory()
-        self.color = self.memory.get('color') or "light_blue"
+        active_profile = self.memory.get("profile") or "Default"
 
+        self.config = ConfigManager("memory.ini", profile=active_profile)
+        self.memory = self.config.load_memory()
+
+        self.color = self.memory.get('color') or "light_blue"
         self.header = (colored(" Developer Assistant ", f"{self.color}"))
         self.user_path = os.environ.get('USERPROFILE') or os.environ.get('HOME', 'User')
 
