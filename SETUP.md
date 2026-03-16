@@ -16,6 +16,7 @@
 > Avoid using `sudo pip install` because it installs into the system Python.
 If you want a system‑wide install, use the uv method or use `pip install --user`
 
+---
 
 ## Installing from a cloned repository:
 **Using uv (recommended for clones):**
@@ -46,9 +47,7 @@ This creates a local environment and installs all required dependencies.
 2. `uv run -m da.interface`
 
 > [!NOTE]
-> You can then also create an `Interface.py` shortcut to use the program. (*Icons included.*)
-
-Note that in this case the program will also run from the repo folder, not system-wide.
+> You can then also create an `Interface.py` shortcut to use the program. (*Icons included.*) Do note that in this case the program will also run from the repo folder, not system-wide.
 
 
 ### Creating a shortcut on Linux:

@@ -20,7 +20,7 @@ class VersionLogic:
         self.config = config
         self.color = color
         self.header = header
-        self.cls = cls
+        self.clear = cls
         self.user_path = user_path
 
         self.memory = self.config.load_memory()
@@ -37,13 +37,15 @@ class VersionLogic:
         ROOT = Path(__file__).resolve().parents[1]
         self.templog_path = ROOT / "CHANGELOG.tmp"
 
+        no_path = colored("\nSystem cannot find the changelog path.", "light_red")
+
         while True:
             self.setting = load_manager.load_project()
             self.changelog_path = Path(self.setting.get('changelog'))
             self.prj_ver = self.setting.get('version')
             prj_path = Path(self.setting.get('path'))
 
-            os.system(self.cls)
+            os.system(self.clear)
             print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Projects / Project menu / Changelog")
             print(self.header.center(127, "="))
             print("E. Back\n")
@@ -52,7 +54,7 @@ class VersionLogic:
             print("Version: " + colored(self.prj_ver, f"{self.color}"))
             print("\n1. Create a new changelog")
             print("2. Add new changes")
-            print("3. Open the changelog")
+            print("\n3. Open the changelog")
             print("4. Preview .md changelog\n")
 
             choice = input(f"{self.user_path}> ").strip()
@@ -69,25 +71,25 @@ class VersionLogic:
 
             elif choice == "2":
                 if not os.path.exists(self.changelog_path):
-                    print(colored("\nSystem cannot find the changelog path.", "light_red"))
+                    print(no_path)
                     time.sleep(1.5)
                 else:
                     self.update_changelog()
 
             elif choice == "3":
                 if not os.path.exists(self.changelog_path):
-                    print(colored("\nSystem cannot find the changelog path.", "light_red"))
+                    print(no_path)
                     time.sleep(1.5)
-                    pass
+                    continue
                 else:
                     if self.check_size():
-                        pass
+                        continue
                     else:
                         Opener.open(self.changelog_path)
 
             elif choice == "4":
                 if not os.path.exists(self.changelog_path):
-                    print(colored("\nSystem cannot find the changelog path.", "light_red"))
+                    print(no_path)
                     time.sleep(1.5)
                 else:
                     self.view_md(self.changelog_path)
@@ -98,24 +100,24 @@ class VersionLogic:
                 time.sleep(1)
             
     def create_changelog(self):
-        os.system(self.cls)
+        os.system(self.clear)
         print(self.header.center(127, "="))
         print("E. Back/abort\n")
 
         if os.path.exists(self.changelog_path):
             print(colored("This action will overwrite your existing changelog!\n", "yellow"))
-            input("Acknowledge..." + colored("[Enter]", f"{self.color}"))
+            input("Acknowledge..." + colored("[Enter]\n", f"{self.color}"))
 
-        version = input("\nVersion: ")
+        version = input("Version > ")
         if version.lower() == "e":
             return
-        change_type = input("\nChange type: ")
+        change_type = input("\nChange type > ")
 
-        entry = prompt("\nFirst entry: ")
+        entry = prompt("\nFirst entry > ")
 
-        comment = prompt("\nOptional comment: ")
+        comment = prompt("\nOptional comment > ")
 
-        choice = input("\nSave (Enter) Cancel (E).\nAdd further entries with 'Add new changes' in the menu.")
+        choice = input("\nSave (Enter) Cancel (E).\nAdd further entries with 'Add new changes' in the menu! > ")
         if choice.lower() == "e":
             return
 
@@ -136,6 +138,7 @@ class VersionLogic:
 
         new_config = ConfigManager(f"{self.active_project}.ini", profile=self.active_profile)
         new_config.update_project("version", version)
+        new_config.update_project("edited", self.today)
 
         last_project = self.memory.get('last_project')
         if last_project != self.active_project:
@@ -151,11 +154,11 @@ class VersionLogic:
         self.change = None
         self.comment = None
         while True:
-            os.system(self.cls)
+            os.system(self.clear)
             print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Projects / Project menu / Changelog / Add changes")
             print(self.header.center(127, "="))
             print("E. Back/abort")
-            print("O. Open templog for fixes.")
+            print("O. Open templog for fixes")
             print("S. Review changes & save\n")
 
             print(colored("Chosen project:", attrs=["underline"]))
@@ -221,7 +224,7 @@ class VersionLogic:
                 f.write(header + "\n")
 
         while True:
-            os.system(self.cls)
+            os.system(self.clear)
             print(self.header.center(127, "="))
 
             print("Chosen change type:")
@@ -248,7 +251,7 @@ class VersionLogic:
                 return
 
     def save_changes(self):
-        os.system(self.cls)
+        os.system(self.clear)
         print(self.header.center(127, "="))
         print(colored("Please check the output file:", f"{self.color}", attrs=["underline"]))
 
@@ -323,6 +326,7 @@ class VersionLogic:
 
         new_config = ConfigManager(f"{self.active_project}.ini", profile=self.active_profile)
         new_config.update_project("version", version)
+        new_config.update_project("edited", self.today)
 
         last_project = self.memory.get('last_project')
         if last_project != self.active_project:
@@ -336,7 +340,7 @@ class VersionLogic:
         if self.check_size():
             return
 
-        os.system(self.cls)
+        os.system(self.clear)
         print(self.header.center(127, "="))
         print("")
 

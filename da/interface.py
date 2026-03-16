@@ -17,8 +17,8 @@ from importlib import resources
 
 class Interface:
     def __init__(self):
-        self.version = "0.4.0"
-        self.cls = 'cls' if platform.system() == 'Windows' else 'clear'
+        self.version = "0.3.0"
+        self.clear = 'cls' if platform.system() == 'Windows' else 'clear'
 
         title = f"DA - {self.version}"
 
@@ -43,7 +43,7 @@ class Interface:
         ]
 
         for label, step in track(steps):
-            os.system(self.cls)
+            os.system(self.clear)
             print(label.center(65))
             result = step()
             time.sleep(0.30)
@@ -56,7 +56,7 @@ class Interface:
 
         if os.path.exists(temp_log):
             while True:
-                os.system(self.cls)
+                os.system(self.clear)
                 print(colored(f"Temporary changelog detected in:\n{temp_log}\n", "yellow"))
                 print(colored("D", "light_red") + "elete or " + colored("K", "light_red") + "eep?\n")
                 choice = input(f"{self.user_path}> ").lower()
@@ -78,7 +78,15 @@ class Interface:
 
             elif state == "menu":
                 result = self.menu()
-                if result == "exit":
+                if result == "profiles":
+                    self.profiles()
+                    state = "menu"
+
+                elif result == "settings":
+                    self.settings()
+                    state = "menu"
+
+                elif result == "exit":
                     state = "exit"
 
     def menu(self):
@@ -88,26 +96,26 @@ class Interface:
             config=self.config,
             color=self.color,
             header=self.header,
-            cls=self.cls,
+            cls=self.clear,
             user_path=self.user_path
         )
 
         last_project = self.memory.get('last_project')
         while True:
-            os.system(self.cls)
+            os.system(self.clear)
             print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu")
             print(self.header.center(127, "="))
             print("E. Exit\n")
             print("Last project:")
             print(colored(last_project, f"{self.color}"))
             print("\n1. Projects")
-            print("2. Settings")
-            print("3. Profiles\n")
+            print("2. Profiles")
+            print("3. Settings\n")
 
             choice = input(f"{self.user_path}> ").strip()
 
             if choice.lower() == "e":
-                os.system(self.cls)
+                os.system(self.clear)
                 print(self.header.center(127, "="))
                 print("Bye!")
                 time.sleep(1)
@@ -117,10 +125,10 @@ class Interface:
                 projects_manager.projects(self.active_profile)
 
             elif choice == "2":
-                self.settings()
+                return "profiles"
 
             elif choice == "3":
-                self.profiles()
+                return "settings"
             else:
                 print("")
                 print(colored("Unknown option...", "light_red", attrs=["blink"]))
@@ -128,7 +136,7 @@ class Interface:
     
     def settings(self):
         while True:
-            os.system(self.cls)
+            os.system(self.clear)
             print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Settings")
             print(self.header.center(127, "="))
             print("E. Back\n")
@@ -163,7 +171,7 @@ class Interface:
 
     def profiles(self):
         while True:
-            os.system(self.cls)
+            os.system(self.clear)
             print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Profiles")
             print(self.header.center(127, "="))
             print("E. Back\n")
@@ -189,11 +197,11 @@ class Interface:
             prof_dir = self.config.profile_dir
             contents = os.listdir(prof_dir)
 
-            print("\Your profiles:")
+            print("\nYour profiles:")
             for item in contents:
                 print(colored(f" - {item}", f"{self.color}"))
 
-            name = input("\nType profile name: ")
+            name = input("\nProfile name > ").strip()
 
             if name in contents:
                 self.config.update_memory("CONFIG", "profile", name)
@@ -209,10 +217,10 @@ class Interface:
             else:
                 print(colored("\nInvalid name!", "yellow"))
                 time.sleep(1)
-                os.system(self.cls)
+                os.system(self.clear)
 
     def new_profile(self):
-        name = input("\nNew profile name: ")
+        name = input("\nNew profile name > ").strip()
 
         profile_dir = self.config.profile_dir / name
         profile_dir.mkdir(parents=True, exist_ok=True)
@@ -267,7 +275,7 @@ class Interface:
                 shutil.copy(item, dest)
 
     def intro(self):
-        os.system(self.cls)
+        os.system(self.clear)
         print(colored("Welcome to the Developer Assistant\n", f"{self.color}", attrs=["bold"]))
         print("Here's everything you need to get started...\n")
 

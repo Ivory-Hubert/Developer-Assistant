@@ -1,0 +1,52 @@
+Modules:
+interface.py (Entry point. Runtime & environment validation and setup)
+projects_manager.py (Gather the data for new ini files, forwards it for creating a new one or overwriting.)
+config_manager.py (Loads ini files and/or overwrites them with ProjectsManager()'s help. Also sets up local user data folders for migration and validation.)
+version_logic.py (Creates/updates the changelogs of the projects)
+opener.py (Cross-platform file and folder opening utility)
+
+Planned:
+cloud_backup.py (Backs up the changes into the users preferred cloud service)
+===============================================================================
+(* - not yet started)
+Structure:
+
+    	            Assistant's TUI
+  	                      |
+Projects     <--->     Settings       <--->      Profiles
+    |         	          |                         |
+- x3 pinned	           Pin projects*             Create new profile
+- Latest project       Memory ini management     Switch profiles
+- New project          Access local data
+- Profile projects
+    |
+	|
+- Enter new project info
+- Change project info
+
+- Cloud backup*    ------> Cloud Backup
+				                |
+			             1. Identifies the projects
+			                cloud service.
+			             2. Performs an automatic backup.
+			             3. Opens the cloud service.
+
+- Manage changelogs ------> Version Logic
+				                |
+			                 Update individual
+			                 changelogs
+===============================================================================
+Users local data folder structure:
+memory.ini -> last project; pinned projects; active profile; color preference
+Profiles
+   |
+In each profile:
+Projects
+Templates
+
+==Startup routine==
+1. Identify the current execution context
+2. Verify the existance and integrity of local user data
+3. Initialize the environment if missing or unsafe
+4. Inspect and resolve .tmp files from last sessions
+5. Set up shared state and enter the main loop

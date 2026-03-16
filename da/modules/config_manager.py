@@ -83,6 +83,7 @@ class ConfigManager:
 
         prj = project_parser['SETTINGS']
         return {
+            'edited' : prj.get('edited'),
             'owner' : prj.get('owner', 'Default'),
             'path': prj.get('path'),
             'changelog': prj.get('changelog'),

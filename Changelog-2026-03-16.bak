@@ -1,45 +1,8 @@
 # Changelog
 
-All notable changes to Developer-Assistant(DA) will be documented in this file.
+All notable changes to Developer-Assistant will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
-
-DA assures the format stays consistent.
-
-## [0.3.0] - 2026-03-16
-
-### Added
-- **Custom profiles**
-
-With a new directory structure for user data to support endless profiles. 
-To support and leverage the new system I added `owner` and `edited` variables to project `.ini` files. `memory.ini` takes care of tracking the active profile. The user can switch profiles and manage profile specific projects straight from the menus. The creation of a new profile requires just a one string input in `Main menu / Profiles`. The active profile is displayed on the top-left corner.
-
-- **Extended atomic file operations**
-
-Changelogs now use the same robust tempfile/replace system `.ini` files use.
-
-- **File size checks**
-
-DA wont try to open or display changelogs bigger than 100MB, since that's not very good on the terminal or your system... as I discovered.
-
-- **Did I edit this project today?**
-
-Now you know, since after every changelog creation/update the Project menu will show you if it was today, yesterday or whenever.
-
-### Changed
-- **Recover changelog backup**
-
-Due to changelog updates being safer now, I transformed the changelog backup that was previously a `.md` file into `.bak`, with a simple option to restore it in project settings.
-
-- **Optimized startup**
-
-The loading bar that was purely decorative for a long time is now tied to runtime setup and initialization tasks, hence making it faster too.
-
-### Fixed
-- **Unclear separation of concerns**
-
-`ConfigManager()` does not print messages anymore, instead returns them to `Interface()`. Also migrated the Projects menu from `Interface()` to `ProjectsManager()`, was truly a faux pas on my part to keep it there for so long.
-
 
 ## [0.2.5] - 2026-03-13
 
