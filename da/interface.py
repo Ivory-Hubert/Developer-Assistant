@@ -230,7 +230,7 @@ class Interface:
         self.memory = self.config.load_memory()
 
         profile = self.memory.get('profile')
-        self.config = ConfigManager("memory.ini", pactive_profile)
+        self.config = ConfigManager("memory.ini", profile=profile)
 
         self.memory = self.config.load_memory()
         self.active_profile = self.memory.get('profile')
