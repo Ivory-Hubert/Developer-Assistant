@@ -1,6 +1,6 @@
 [project]
 name = "developer-assistant"
-version = "0.3.0"
+version = "0.3.5"
 description = "A lightweight TUI app for managing and simplifying your Markdown changelogs."
 readme = "PYPI.md"
 requires-python = ">=3.10"
@@ -13,7 +13,6 @@ dependencies = [
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Environment :: Console",
     "Topic :: Software Development :: Libraries :: Python Modules",
@@ -21,8 +20,6 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/Ivory-Hubert/Developer-Assistant"
-Repository = "https://github.com/Ivory-Hubert/Developer-Assistant.git"
-Issues = "https://github.com/Ivory-Hubert/Developer-Assistant/issues"
 Changelog = "https://github.com/Ivory-Hubert/Developer-Assistant/blob/main/CHANGELOG.md"
 
 [project.scripts]

@@ -24,6 +24,7 @@ class VersionLogic:
         self.user_path = user_path
 
         self.memory = self.config.load_memory()
+        self.console = Console()
     
     def project_menu(self, project, profile):
         self.active_project = project
@@ -43,16 +44,16 @@ class VersionLogic:
             self.setting = load_manager.load_project()
             self.changelog_path = Path(self.setting.get('changelog'))
             self.prj_ver = self.setting.get('version')
-            prj_path = Path(self.setting.get('path'))
+            self.prj_path = Path(self.setting.get('path'))
 
             os.system(self.clear)
             print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Projects / Project menu / Changelog")
-            print(self.header.center(127, "="))
+            print(self.header)
             print("E. Back\n")
             print(colored("Chosen project:", attrs=["underline"]))
             print(colored(self.active_project, f"{self.color}"))
             print("Version: " + colored(self.prj_ver, f"{self.color}"))
-            print("\n1. Create a new changelog")
+            print("\n1. Format & commit")
             print("2. Add new changes")
             print("\n3. Open the changelog")
             print("4. Preview .md changelog\n")
@@ -63,26 +64,27 @@ class VersionLogic:
                 return
 
             elif choice == "1":
-                if not os.path.exists(prj_path):
-                    print(colored("\nSystem cannot find the path to this project.", "light_red"))
-                    time.sleep(1.5)
-                else:
-                    self.create_changelog()
-
-            elif choice == "2":
                 if not os.path.exists(self.changelog_path):
                     print(no_path)
-                    time.sleep(1.5)
+                    time.sleep(1)
+                else:
+                    self.finalise()
+
+            elif choice == "2":
+                if not os.path.exists(self.prj_path):
+                    print(colored("\nSystem cannot find the path to this project.", "light_red"))
+                    time.sleep(1)
                 else:
                     self.update_changelog()
 
             elif choice == "3":
                 if not os.path.exists(self.changelog_path):
                     print(no_path)
-                    time.sleep(1.5)
+                    time.sleep(1)
                     continue
                 else:
-                    if self.check_size():
+                    method = self.check_size()
+                    if method == "reject":
                         continue
                     else:
                         Opener.open(self.changelog_path)
@@ -90,55 +92,56 @@ class VersionLogic:
             elif choice == "4":
                 if not os.path.exists(self.changelog_path):
                     print(no_path)
-                    time.sleep(1.5)
+                    time.sleep(1)
                 else:
-                    self.view_md(self.changelog_path)
+                    log_content = ""
+                    with open(self.changelog_path, "r", encoding="utf-8") as f:
+                        log_content = f.read()
+                    self.view_md(log_content)
 
             else:
                 print("")
-                print(colored("Unknown option...", "light_red", attrs=["blink"]))
+                print(colored("Unknown option...", "light_red", attrs=["bold"]))
                 time.sleep(1)
             
-    def create_changelog(self):
-        os.system(self.clear)
-        print(self.header.center(127, "="))
-        print("E. Back/abort\n")
-
-        if os.path.exists(self.changelog_path):
-            print(colored("This action will overwrite your existing changelog!\n", "yellow"))
-            input("Acknowledge..." + colored("[Enter]\n", f"{self.color}"))
-
-        version = input("Version > ")
-        if version.lower() == "e":
-            return
-        change_type = input("\nChange type > ")
-
-        entry = prompt("\nFirst entry > ")
-
-        comment = prompt("\nOptional comment > ")
-
-        choice = input("\nSave (Enter) Cancel (E).\nAdd further entries with 'Add new changes' in the menu! > ")
-        if choice.lower() == "e":
-            return
-
-        data = {
-            "date": self.today,
-            "version": version,
-            "type": change_type,
-            "changes": entry,
-            "comments": comment
-        }
+    def finalise(self):
+        with open(self.changelog_path, "r", encoding="utf-8") as f:
+            existing = f.read()
 
         template = self.template_loader("changelog_template.txt")
 
-        rendered = self.template_renderer(template, data)
+        combined = template + "\n" + existing
 
-        with open(self.changelog_path, "w", encoding="utf-8") as f:
-            f.write(rendered + "\n")
+        prj_dir = self.changelog_path.parent
+        fd, temp_path = tempfile.mkstemp(dir=prj_dir, text=True)
 
-        new_config = ConfigManager(f"{self.active_project}.ini", profile=self.active_profile)
-        new_config.update_project("version", version)
-        new_config.update_project("edited", self.today)
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                f.write(combined)
+                f.flush()
+
+            os.replace(temp_path, self.changelog_path)
+
+        except Exception as e:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            raise e
+
+        cmd = self.setting.get('command')
+
+        if cmd.strip():
+            print("\nwill run: " + colored(f"{cmd}", f"{self.color}"))
+            print("in folder: " + colored(f"{self.prj_path}", f"{self.color}"))
+            confirm = input("\nConfirm[Enter] or abort[E] > ").strip()
+            print("")
+
+            if confirm.lower() == "e":
+                return
+            try:
+                subprocess.run(cmd, cwd=self.prj_path, shell=True, check=True)
+            except Exception as e:
+                print(colored("\nfailed: ", "light_red") + f"{e}")
+                input("\nReturn...[Enter]")
 
         last_project = self.memory.get('last_project')
         if last_project != self.active_project:
@@ -147,8 +150,10 @@ class VersionLogic:
         return
 
     def update_changelog(self):
-        if self.check_size():
-            return
+        if os.path.exists(self.changelog_path):
+            method = self.check_size()
+            if method == "reject":
+                return
 
         self.change_type = None
         self.change = None
@@ -156,7 +161,7 @@ class VersionLogic:
         while True:
             os.system(self.clear)
             print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Projects / Project menu / Changelog / Add changes")
-            print(self.header.center(127, "="))
+            print(self.header)
             print("E. Back/abort")
             print("O. Open templog for fixes")
             print("S. Review changes & save\n")
@@ -183,7 +188,6 @@ class VersionLogic:
 
             type_choice = input(f"{self.user_path}> ").strip()
 
-            #==Assign change types to keys==
             type_map = {
                 "1": "Added",
                 "2": "Removed",
@@ -207,7 +211,7 @@ class VersionLogic:
                 self.save_changes()
             else:
                 print("")
-                print(colored("Unknown option...", "light_red", attrs=["blink"]))
+                print(colored("Unknown option...", "light_red", attrs=["bold"]))
                 time.sleep(1)
 
     def prepend_changes(self):
@@ -218,21 +222,20 @@ class VersionLogic:
             with open(self.templog_path, "r", encoding="utf-8") as f:
                 existing = f.read()
 
-        #==Add the change type header if needed==
         if header not in existing:
             with open(self.templog_path, "a", encoding="utf-8") as f:
                 f.write(header + "\n")
 
         while True:
             os.system(self.clear)
-            print(self.header.center(127, "="))
+            print(self.header)
 
             print("Chosen change type:")
             print(colored(self.change_type, f"{self.color}"))
 
-            self.change = prompt("\nChange entry: ")
+            self.change = prompt("\nChange entry > ")
 
-            self.comment = prompt("\nOptional comment: ")
+            self.comment = prompt("\nOptional comment > ")
 
             data = {
                 "changes": self.change,
@@ -246,13 +249,13 @@ class VersionLogic:
             with open(self.templog_path, "a", encoding="utf-8") as f:
                 f.write(rendered + "\n")
 
-            choice = input("\nSave & exit [E] or add more [Enter]? ")
+            choice = input("\nNew type [E] or add more [Enter] > ")
             if choice.lower() == "e":
                 return
 
     def save_changes(self):
         os.system(self.clear)
-        print(self.header.center(127, "="))
+        print(self.header)
         print(colored("Please check the output file:", f"{self.color}", attrs=["underline"]))
 
         templog_content = ""
@@ -260,18 +263,15 @@ class VersionLogic:
             with open(self.templog_path, "r", encoding="utf-8") as f:
                 templog_content = f.read()
 
-            print(colored(f"[New version] - {self.today}\n", "magenta", attrs=["underline"]))
+            message = colored(f"[New version] - {self.today}\n", "magenta", attrs=["underline"])
 
-            MARKDOWN = templog_content
-            console = Console()
-            md = Markdown(MARKDOWN)
-            console.print(md)
+            self.view_md(templog_content, message)
         else:
             print(colored("No changes added.", "light_red"))
             time.sleep(1)
             return
 
-        choice = input("\nContinue" + colored("[Enter]", f"{self.color}") + " or go back" + colored("[E] ", f"{self.color}"))
+        choice = input("\nContinue" + colored("[Enter]", f"{self.color}") + " or add more" + colored("[E] ", f"{self.color}"))
 
         if choice.lower() == "e":
             return
@@ -291,10 +291,8 @@ class VersionLogic:
 
         old_content = ""
         if os.path.exists(self.changelog_path):
-            #==Make a duplicate of the old changelog==
-            log_name = f"Changelog-{self.today}.bak"
-            project_folder = Path(self.setting.get('path'))
-            duplicate_path = project_folder / log_name
+            log_name = "changelog.bak"
+            duplicate_path = self.prj_path / log_name
 
             src = self.changelog_path
             dest = duplicate_path
@@ -336,35 +334,47 @@ class VersionLogic:
         time.sleep(2)
         return
 
-    def view_md(self, log_path):
-        if self.check_size():
-            return
+    def view_md(self, log_content, message=None):
+        flag = 0
+        if not message:
+            method = self.check_size()
+            if method == "reject":
+                return
+            elif method == "print":
+                flag = 1
 
-        os.system(self.clear)
-        print(self.header.center(127, "="))
-        print("")
+        if message:
+            print(message)
+        else:
+            os.system(self.clear)
+            print(self.header)
+            print("")
 
-        log_content = ""
-        with open(log_path, "r", encoding="utf-8") as f:
-            log_content = f.read()
+        if flag:
+            print(log_content)
+            print(colored("\nThis log is too large to render in Markdown! (Max 10MB)", "yellow"))
+        else:
+            md = Markdown(log_content)
+            self.console.print(md)
 
-        MARKDOWN = log_content
-        console = Console()
-        md = Markdown(MARKDOWN)
-        console.print(md)
-
-        input("\nReturn..." + colored("[Enter]", f"{self.color}"))
+        if not message:
+            input("\nReturn..." + colored("[Enter]", f"{self.color}"))
         return
 
     def check_size(self):
-        MAX_SIZE = 100 * 1024 * 1024
+        print_size = 10 * 1024 * 1024
+        max_size = 20 * 1024 * 1024
 
         size = self.changelog_path.stat().st_size
         size_mb = size / (1024 * 1024)
-        if size > MAX_SIZE:
+
+        if size > max_size:
             print(colored(f"\nChangelog too large to load safely: {size_mb:.2f} MB", "light_red"))
             time.sleep(2)
-            return True
+            return "reject"
+
+        elif size > print_size:
+            return "print"
 
     def template_loader(self, template_file):
         template_path = self.config.templates_folder / template_file

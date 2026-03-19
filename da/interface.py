@@ -17,7 +17,7 @@ from importlib import resources
 
 class Interface:
     def __init__(self):
-        self.version = "0.3.0"
+        self.version = "0.3.5"
         self.clear = 'cls' if platform.system() == 'Windows' else 'clear'
 
         title = f"DA - {self.version}"
@@ -104,7 +104,7 @@ class Interface:
         while True:
             os.system(self.clear)
             print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu")
-            print(self.header.center(127, "="))
+            print(self.header)
             print("E. Exit\n")
             print("Last project:")
             print(colored(last_project, f"{self.color}"))
@@ -116,7 +116,7 @@ class Interface:
 
             if choice.lower() == "e":
                 os.system(self.clear)
-                print(self.header.center(127, "="))
+                print(self.header)
                 print("Bye!")
                 time.sleep(1)
                 return "exit"
@@ -131,14 +131,14 @@ class Interface:
                 return "settings"
             else:
                 print("")
-                print(colored("Unknown option...", "light_red", attrs=["blink"]))
+                print(colored("Unknown option...", "light_red", attrs=["bold"]))
                 time.sleep(1)
     
     def settings(self):
         while True:
             os.system(self.clear)
             print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Settings")
-            print(self.header.center(127, "="))
+            print(self.header)
             print("E. Back\n")
 
             print(colored("Configuration options", attrs=["underline"]))
@@ -166,14 +166,14 @@ class Interface:
                 Opener.open(self.config.templates_folder)
             else:
                 print("")
-                print(colored("Unknown option...", "light_red", attrs=["blink"]))
+                print(colored("Unknown option...", "light_red", attrs=["bold"]))
                 time.sleep(1)
 
     def profiles(self):
         while True:
             os.system(self.clear)
             print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Profiles")
-            print(self.header.center(127, "="))
+            print(self.header)
             print("E. Back\n")
 
             print("1. Create a new profile")
@@ -189,7 +189,7 @@ class Interface:
                 self.switch_profile()
             else:
                 print("")
-                print(colored("Unknown option...", "light_red", attrs=["blink"]))
+                print(colored("Unknown option...", "light_red", attrs=["bold"]))
                 time.sleep(1)
 
     def switch_profile(self):
@@ -256,8 +256,16 @@ class Interface:
         self.memory = self.config.load_memory()
 
         self.color = self.memory.get('color') or "light_blue"
-        self.header = (colored(" Developer Assistant ", f"{self.color}"))
         self.user_path = os.environ.get('USERPROFILE') or os.environ.get('HOME', 'User')
+
+        brand = (colored(" Developer Assistant ", f"{self.color}"))
+        text = " Developer Assistant "
+
+        columns, _ = shutil.get_terminal_size()
+        pad_size = (columns - len(text)) // 2
+        bars = "=" * max(0, pad_size)
+
+        self.header = f"{bars}{brand}{bars}"
 
     def local_init(self):
         default_files = resources.files("da.default")
@@ -268,7 +276,7 @@ class Interface:
                 shutil.copy(item, dest)
 
         self.config.projects_folder.mkdir(parents=True, exist_ok=True)
-        # Add Test-Project
+
         dest = self.config.projects_folder
         for item in default_files.iterdir():
             if item.name == "test-project.ini":
@@ -283,9 +291,8 @@ class Interface:
 
         readme_content = resources.files("da").joinpath("intro.md").read_text()
 
-        MARKDOWN = readme_content
         console = Console()
-        md = Markdown(MARKDOWN)
+        md = Markdown(readme_content)
         console.print(md)
 
         input("\nContinue..." + colored("[Enter]", f"{self.color}"))

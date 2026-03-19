@@ -3,9 +3,11 @@
 
 > **A lightweight TUI app for managing and simplifying your Markdown changelogs.**
 
-* **Setup:** Start with [SETUP](./SETUP.md) to get started.
+> `pip install developer-assistant`
 
-* **Changes:** Yes, I keep a [CHANGELOG](./CHANGELOG.md)
+* **Installation:** detailed instructions in [SETUP](./SETUP.md)
+
+* **Changes:** yes, I keep a [CHANGELOG](./CHANGELOG.md)
 
 ---
 
@@ -19,6 +21,8 @@
 ## Appearance
 
 ### Coloured, easy-to-use menus
+A comfortable interface with a modern polish, built the good old way:
+
 ![Changelog Menu](documents/images/changelog-menu.png)
 
 ### Beautiful changelog previews
@@ -30,9 +34,9 @@ Preview your Markdown changelogs directly in the terminal with Rich rendering:
 ## Introduction
 
 ### What does this tool do?
-Developer Assistant is a lightweight TUI for simplifying and managing your changelogs. You can customize the templates for each profile to match your existing format, and use DA as a central hub to access every changelog and project folder you maintain.
+Developer Assistant is a lightweight TUI for simplifying and managing your changelogs. You can customize the templates for **each profile** to match your existing format, and use DA as a central hub to access every changelog and project folder you maintain.
 
-You can create as many profiles as you need. Each profile gets its own **project specific** `.ini` files, created automatically through the menu based on the information you provide. These act as links that tell DA where your changelogs are and what's the last version number.
+You can create as many profiles as you need. Each profile gets its own **project specific** `.ini` files, created automatically through the menu based on the information you provide. These act as links that tell DA where your changelogs are, which profile owns them and what's the last version number.
 
 Your files are kept safe at all times. Before adding new changes, your existing `CHANGELOG.md` is automatically backed up. While editing, all changes are written to a temporary file first and only prepended to & replaced with your real changelog once you confirm them.
 
@@ -55,21 +59,42 @@ Don't change the folder structure or modify variable names inside `.ini` files.
 
 The `da-ui/` folder and subfolders will be created automatically.
 
-You can access its content quickly when going to: `Main menu / Settings`
+> [!TIP] 
+> You can access its content quickly when going to: `Main menu / Settings`
 
 **Profiles for seperate projects and templates**
 
 The program comes with the "Default" profile, you can choose to either stick with this one or create your own profiles in `Main menu / Profiles`. Each profile has seperate projects and they can't be accessed by other profiles. You can choose to customize the templates seperately too.
 
-Migrating a project or template from one profile to another is currently manual, **make sure to also change the "*owner*" value in `.ini` files accordingly**.
+> [!NOTE]
+> Migrating a project or template from one profile to another is currently manual, **make sure to also change the "*owner*" value in `.ini` files accordingly**.
+
+---
 
 **Customizable templates**
 
 In the **local** `Templates/` folder you can modify the template contents to your liking - **just avoid changing the `{{placeholder}}` names**.
 
+Templates come in three flavours:
+
+* changelog_template.txt - *Changelog title*
+
+* header_template.txt - *Version and date*
+
+* entry_template.txt - *Change entry and comments*
+
+
 **Linked projects all in one place**
 
 The `Projects/` folder holds the `.ini` files you create when starting a new project with DA. 
+
+[Project.ini example](./documents/project-example.ini)
+
+The `command` variable is a custom command that DA will run in your project folder once you choose "Format & commit" in `Main menu / Projects / Project menu / Changelog`. Even when provided, it is **not** run without your confirmation, first it's printed with the folder name and you can choose to skip it.
+
+`owner` & `edited` are filled out automatically when a new project is created and `edited` updates with every changelog update.
+
+---
 
 **Safe changelog updates**
 
@@ -79,9 +104,11 @@ New changes are first written to a temporary file and only prepended to & replac
 This ensures your existing changelog is never overwritten or corrupted, and you always have a fallback copy.
 If the temporary changelog is present on startup you are prompted to remove or keep it.
 
+
 **Ease of navigation**
 
 You can access files/folders and configuration straight from the menus, so you shouldn't find yourself searching through the program's directory or even your local user data very often.
+
 
 **Configuration**
 
@@ -97,7 +124,8 @@ The `memory.ini` file does exactly what you'd expect, it features:
 
 Last project & active profile get updated automatically, the rest are up to you.
 
-**`Ctrl+C` works everywhere to quickly exit DA.**
+> [!TIP] 
+> **`Ctrl+C` works everywhere to quickly exit DA.**
 
 ---
 
@@ -113,10 +141,15 @@ Once configured, you can create as many changelog entries as you want by picking
 Two possibilities, depending on how you installed.
 
 ### 1. Installed from PyPI
-A. **Using uv:** `uv tool upgrade developer-assistant`
+A. **Using uv:** 
+```bash
+uv tool upgrade developer-assistant
+```
 
-B. **Using pip:** `python -m pip install -U developer-assistant`
-
+B. **Using pip:** 
+```bash
+python -m pip install -U developer-assistant
+```
 
 ### 2. Installed from a local clone
 *Run all terminal commands in the repo folder*

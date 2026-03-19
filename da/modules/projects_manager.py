@@ -5,6 +5,7 @@ import platform
 from pathlib import Path
 from datetime import datetime
 
+from prompt_toolkit import prompt
 from termcolor import colored
 
 from da.modules.config_manager import ConfigManager
@@ -25,7 +26,7 @@ class ProjectsManager:
             self.memory = self.config.load_memory()
             os.system(self.clear)
             print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Projects")
-            print(self.header.center(127, "="))
+            print(self.header)
             print("E. Back\n")
             print(colored("1. Last project:", attrs=["underline"]))
             print(colored(self.memory.get('last_project'), f"{self.color}"))
@@ -48,7 +49,7 @@ class ProjectsManager:
             elif choice == "1":
                 project = self.memory.get('last_project')
                 if not project:
-                    print(colored("\nLast project has not been defined...", "light_red", attrs=["blink"]))
+                    print(colored("\nLast project has not been defined...", "light_red", attrs=["bold"]))
                     time.sleep(1)
                 else:
                     self.load_project(f"{project}")
@@ -57,7 +58,6 @@ class ProjectsManager:
                 self.new_project()
 
             elif choice.lower() in ("a", "b", "c"):
-                #==If the pinned project is empty, return an error message==
                 options_map = {
                     'a': 'pinned_project',
                     'b': 'pinned_project1',
@@ -67,7 +67,7 @@ class ProjectsManager:
                 project_name = self.memory.get(key)
                 if project_name == "":
                     print("")
-                    print(colored(f"Project '{choice}' has not been defined...", "light_red", attrs=["blink"]))
+                    print(colored(f"Project '{choice}' has not been defined...", "light_red", attrs=["bold"]))
                     time.sleep(1)
                 else:
                     project = self.memory.get(key)
@@ -77,7 +77,7 @@ class ProjectsManager:
                 self.prf_projects()
             else:
                 print("")
-                print(colored("Unknown option...", "light_red", attrs=["blink"]))
+                print(colored("Unknown option...", "light_red", attrs=["bold"]))
                 time.sleep(1)
 
     def new_project(self):
@@ -86,21 +86,23 @@ class ProjectsManager:
         now = datetime.now()
         today = now.strftime("%Y-%m-%d")
 
-        print(self.header.center(127, "="))
+        print(self.header)
         print("E. Abort/back\n")
         
-        name = input("Enter new project name > ")
+        name = prompt("Enter new project name > ")
         if name.lower() == "e":
             return
-        path = input("\nEnter project path > ")
+        path = prompt("\nEnter project path > ")
 
-        changelog = input("\nProject changelog path > ")
+        changelog = prompt("\nProject changelog path > ")
 
-        version = input("\nCurrent project version > ")
+        version = prompt("\nCurrent project version > ")
 
-        #cloud = input("\nCloud service (not required) > ")
+        command = prompt("\nCustom commit command > ")
 
-        confirm = input("\nConfirm(Y) or abort(E) > ")
+        #cloud = prompt("\nCloud service (not required) > ")
+
+        confirm = input("\nConfirm(Y) or abort(E) > ").strip()
         if confirm.lower() == "e":
             return
             
@@ -112,6 +114,7 @@ class ProjectsManager:
                 "path": path,
                 "changelog": changelog,
                 "version": version,
+                "command": command,
                 "cloud": ""
             }
             new_manager.project_ini()
@@ -119,15 +122,15 @@ class ProjectsManager:
             
         else:
             print("")
-            print(colored("Unknown option, try again...", "light_red", attrs=["blink"]))
-            time.sleep(2)
+            print(colored("Unknown option, try again...", "light_red", attrs=["bold"]))
+            time.sleep(1)
             return
 
     def prf_projects(self):
         while True:
             os.system(self.clear)
             print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Projects / Profile projects")
-            print(self.header.center(127, "="))
+            print(self.header)
             print("E. Back\n")
             prof_prj = self.config.projects_folder
             contents = os.listdir(prof_prj)
@@ -150,7 +153,7 @@ class ProjectsManager:
                 self.load_project(project)
             else:
                 print("")
-                print(colored("Unknown option...", "light_red", attrs=["blink"]))
+                print(colored("Unknown option...", "light_red", attrs=["bold"]))
                 time.sleep(1)
             
     def load_project(self, project):
@@ -190,7 +193,7 @@ class ProjectsManager:
 
             os.system(self.clear)
             print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Projects / Project menu")
-            print(self.header.center(127, "="))
+            print(self.header)
             print("E. Back\n")
             print(colored("Chosen project:", attrs=["underline"]))
             print(colored(project, f"{self.color}"))
@@ -208,8 +211,7 @@ class ProjectsManager:
                 return
 
             elif choice == "1":
-                path = setting.get('path')
-                folder = Path(path)
+                folder = Path(setting.get('path'))
                 Opener.open(folder)
 
             elif choice == "2":
@@ -223,27 +225,28 @@ class ProjectsManager:
                 if os.path.exists(changelog):
                     print(colored("\nThis action will overwrite your existing changelog!\n", "yellow"))
                     input("Acknowledge..." + colored("[Enter]", f"{self.color}"))
-                self.rest_bak(setting, project)
+
+                self.rest_bak(setting, changelog, project)
 
             #elif choice == "5":
 
             else:
                 print("")
-                print(colored("Unknown option...", "light_red", attrs=["blink"]))
+                print(colored("Unknown option...", "light_red", attrs=["bold"]))
                 time.sleep(1)
 
-    def rest_bak(self, setting, project):
+    def rest_bak(self, setting, changelog, project):
         prj_path = Path(setting.get('path'))
         has_bak = list(prj_path.glob("*.bak"))
 
         if not has_bak:
             print(colored(f"\nCan't find any .bak files for {project}", "yellow"))
-            time.sleep(2)
+            time.sleep(1)
             return
 
         bak = has_bak[0]
-        bak.rename(prj_path / "CHANGELOG.md")
-        print(f"\nRenamed {bak.name} to CHANGELOG.md")
+        os.replace(bak, changelog)
+        print(f"\nReplaced {bak.name} with CHANGELOG.md")
         time.sleep(1)
         return
 

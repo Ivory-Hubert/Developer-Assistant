@@ -1,17 +1,18 @@
-Modules:
+==Modules==
 interface.py (Entry point. Runtime & environment validation and setup)
-projects_manager.py (Gather the data for new ini files, forwards it for creating a new one or overwriting.)
-config_manager.py (Loads ini files and/or overwrites them with ProjectsManager()'s help. Also sets up local user data folders for migration and validation.)
-version_logic.py (Creates/updates the changelogs of the projects)
+projects_manager.py (Gather the data for new ini files, forward it for creating a new one or overwriting.)
+config_manager.py (Load ini files and/or overwrite them with ProjectsManager()'s help. Also set up local user data folders for migration and validation.)
+version_logic.py (Create/update the changelogs for projects)
 opener.py (Cross-platform file and folder opening utility)
 
 Planned:
-cloud_backup.py (Backs up the changes into the users preferred cloud service)
+cloud_backup.py (Back up the changes into the users preferred cloud service)
 ===============================================================================
-(* - not yet started)
+(* -> not yet started)
 Structure:
 
     	            Assistant's TUI
+    	               Main menu
   	                      |
 Projects     <--->     Settings       <--->      Profiles
     |         	          |                         |
@@ -24,7 +25,7 @@ Projects     <--->     Settings       <--->      Profiles
 - Enter new project info
 - Change project info
 
-- Cloud backup*    ------> Cloud Backup
+- Cloud backup*    ------>  Cloud Backup
 				                |
 			             1. Identifies the projects
 			                cloud service.
@@ -33,8 +34,10 @@ Projects     <--->     Settings       <--->      Profiles
 
 - Manage changelogs ------> Version Logic
 				                |
-			                 Update individual
-			                 changelogs
+				            Format & run a command 
+				            in the project folder.
+			                Update individual
+			                changelogs.
 ===============================================================================
 Users local data folder structure:
 memory.ini -> last project; pinned projects; active profile; color preference
@@ -46,7 +49,7 @@ Templates
 
 ==Startup routine==
 1. Identify the current execution context
-2. Verify the existance and integrity of local user data
-3. Initialize the environment if missing or unsafe
+2. Verify the existance and integrity of local user data  # - implement file content checks too
+3. Initialize the environment if missing  # - has to be implemented fully (file permissions)
 4. Inspect and resolve .tmp files from last sessions
 5. Set up shared state and enter the main loop

@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 DA assures the format stays consistent.
 
+## [0.3.5] - 2026-03-19
+
+### Added
+- **Format & commit**
+
+Turned `changelog_template.txt` into the changelog title, that the user can modify. Previously it was used for creating new changelogs, but this feature was quite useless. Since you could make new changelogs with the existsing "Add changes" option very well. So now formatting means this template is used to prepend the title to the changelog and the commit part means a custom `command` variable from the projects `.ini` file is used to run a command in the project folder (git for example).
+
+### Changed
+- **File size limits**
+
+I realised the previous limit was way too big. Now, there are two limits. Under 10MB chagelogs will be rendered in the terminal with Rich. Under 20MB logs will be displayed as basic text and anything over that will be rejected.
+
+- **UI tweaks**
+
+When creating new changelogs the prompts use > instaed of : now. The same applies for adding changelog entries aswell. Reduced sleep command durations across the program. Turned the DA header dynamic with simple standard library logic to move away from having a fixed UI appearance.
+
+### Fixed
+- **Unified Markdown rendering**
+
+Previously the `.md` preview for saving changelog entries and just viewing your existsing changelogs from the menu, were seperate instances in the code. This is inneficient and very lazy, so I modified the code to support two seperate entry points to `view_md()`. Also had to do some modifications to that function to support the new two-step size checks.
+
+
 ## [0.3.0] - 2026-03-16
 
 ### Added

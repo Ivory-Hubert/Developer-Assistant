@@ -31,13 +31,15 @@ Don't change the folder structure or modify variable names inside `.ini` files.
 
 The `da-ui/` folder and subfolders will be created automatically.
 
-You can access its content quickly when going to: `Main menu / Settings`
+> Tip:
+> You can access its content quickly when going to: `Main menu / Settings`
 
 **Profiles for seperate projects and templates**
 
 The program comes with the "Default" profile, you can choose to either stick with this one or create your own profiles in `Main menu / Profiles`. Each profile has seperate projects and they can't be accessed by other profiles. You can choose to customize the templates seperately too.
 
-Migrating a project or template from one profile to another is currently manual, **make sure to also change the "*owner*" value in `.ini` files accordingly**.
+> Note:
+> Migrating a project or template from one profile to another is currently manual, **make sure to also change the "*owner*" value in `.ini` files accordingly**.
 
 ---
 
@@ -45,9 +47,24 @@ Migrating a project or template from one profile to another is currently manual,
 
 In the **local** `Templates/` folder you can modify the template contents to your liking - **just avoid changing the `{{placeholder}}` names**.
 
+Templates come in three flavours:
+
+* changelog_template.txt - *Changelog title*
+
+* header_template.txt - *Version and date*
+
+* entry_template.txt - *Change entry and comments*
+
+
 **Linked projects all in one place**
 
 The `Projects/` folder holds the `.ini` files you create when starting a new project with DA. 
+
+The `command` variable is a custom command that DA will run in your project folder once you choose "Format & commit" in `Main menu / Projects / Project menu / Changelog`. Even when provided, it is **not** run without your confirmation, first it's printed with the folder name and you can choose to skip it.
+
+`owner` & `edited` are filled out automatically when a new project is created and `edited` updates with every changelog update.
+
+---
 
 **Safe changelog updates**
 
@@ -57,9 +74,11 @@ New changes are first written to a temporary file and only prepended to & replac
 This ensures your existing changelog is never overwritten or corrupted, and you always have a fallback copy.
 If the temporary changelog is present on startup you are prompted to remove or keep it.
 
+
 **Ease of navigation**
 
 You can access files/folders and configuration straight from the menus, so you shouldn't find yourself searching through the program's directory or even your local user data very often.
+
 
 **Configuration**
 
@@ -75,4 +94,4 @@ The `memory.ini` file does exactly what you'd expect, it features:
 
 Last project & active profile get updated automatically, the rest are up to you.
 
-**`Ctrl+C` works everywhere to quickly exit DA.**
+> **`Ctrl+C` works everywhere to quickly exit DA.**

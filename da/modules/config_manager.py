@@ -65,7 +65,6 @@ class ConfigManager:
         return
         
     def project_ini(self):
-        #==Create new project ini==
         project_parser = configparser.ConfigParser()
         project_parser["SETTINGS"] = self.data
         
@@ -77,7 +76,6 @@ class ConfigManager:
         return
     
     def load_project(self):
-        #==Return project ini variables==
         project_parser = configparser.ConfigParser()
         project_parser.read(self.new_project_ini)
 
@@ -88,6 +86,7 @@ class ConfigManager:
             'path': prj.get('path'),
             'changelog': prj.get('changelog'),
             'version': prj.get('version'),
+            'command': prj.get('command'),
             'cloud': prj.get('cloud')
         }
 

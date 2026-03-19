@@ -1,11 +1,17 @@
 # Setup instructions
 
-## Installing from PyPI (Easiest and recommended):
+The program is designed for minimal friction and simple setup. Only installation is required, on first run DA will create local user data automatically. The same process is used for new profiles.
+
+## Installing from PyPI (easiest and recommended):
 **Using uv:**
-`uv tool install developer-assistant`
+```bash
+uv tool install developer-assistant
+```
 
 **Using pip:**
-`pip install developer-assistant`
+```bash
+pip install developer-assistant
+```
 
 **Then use `da-ui` anywhere in your terminal to run it**
 
@@ -20,14 +26,14 @@ If you want a system‑wide install, use the uv method or use `pip install --use
 
 ## Installing from a cloned repository:
 **Using uv (recommended for clones):**
-1. Open the program's root folder in your terminal.
+1. Open the repository folder in your terminal.
 2. Run `uv tool install .`
 3. Then use `da-ui` anywhere in the system to run it.
 
 **Using pip:**
 
 **Option A - system-wide**
-1. Open the program's root folder in your terminal.
+1. Open the repository folder in your terminal.
 2. Run `pip install .`
 3. Then use `da-ui` anywhere in the system to run it.
 
@@ -37,7 +43,7 @@ If you want a system‑wide install, use the uv method or use `pip install --use
 
 
 ## No install, run from the repository:
-**Use this command while root is open in the terminal:**
+**Run this command with root open in the terminal:**
 1. `uv sync`
 
 This creates a local environment and installs all required dependencies.
@@ -47,7 +53,7 @@ This creates a local environment and installs all required dependencies.
 2. `uv run -m da.interface`
 
 > [!NOTE]
-> You can then also create an `Interface.py` shortcut to use the program. (*Icons included.*) Do note that in this case the program will also run from the repo folder, not system-wide.
+> You can then also create an `interface.py` shortcut to use the program. (*Icons included.*) Do note that in this case the program will also run from the repo folder, not system-wide.
 
 
 ### Creating a shortcut on Linux:
