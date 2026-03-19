@@ -27,6 +27,10 @@ When creating new changelogs the prompts use > instaed of : now. The same applie
 
 Previously the `.md` preview for saving changelog entries and just viewing your existsing changelogs from the menu, were seperate instances in the code. This is inneficient and very lazy, so I modified the code to support two seperate entry points to `view_md()`. Also had to do some modifications to that function to support the new two-step size checks.
 
+- **Backup recovery bug on Windows**
+
+The last published version had a bug in the changelog backup recovery option, that only affected Windows. I fixed it by replacing an attempted rename with os.replace
+
 
 ## [0.3.0] - 2026-03-16
 
