@@ -7,6 +7,23 @@ opener.py (Cross-platform file and folder opening utility)
 
 Planned:
 cloud_backup.py (Back up the changes into the users preferred cloud service)
+
+==Information==
+* Architectural pattern: Delegated Finite State Machine
+Meaning when Interface calls ProjectsManager, the parent state blocks and ProjectsManager takes over the Event Loop until the user returns back to the Main menu, then control is "popped" back up the stack to the caller.
+Interface does not know how modules handle their tasks, VersionLogic and ProjectsManager are both handled by their seperate Event Loops. ConfigManager acts as the I/O database for .ini files.
+
+* Navigation is stack based.
+Modules always return to the caller.
+1. Interface - the base of the stack
+2. ProjectsManager - pushed onto the stack when "Projects" is selected
+3. VersionLogic - pushed onto the stack once a sepcific project is chosen
+
+* Hierarchical State Machine
+Why this approach?
+- Debugging - the procedural deterministic flow makes logic easy to follow.
+- Low overhead - meaning no event listeners and heavy external dependencies.
+- Reliability and longevity - it worked years ago and works years from now.
 ===============================================================================
 (* -> not yet started)
 Structure:
@@ -44,8 +61,8 @@ memory.ini -> last project; pinned projects; active profile; color preference
 Profiles
    |
 In each profile:
-Projects
-Templates
+- Projects
+- Templates
 
 ==Startup routine==
 1. Identify the current execution context

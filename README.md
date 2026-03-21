@@ -5,7 +5,7 @@
 
 > `pip install developer-assistant`
 
-* **Installation:** detailed instructions in [SETUP](./SETUP.md)
+* **Installation:** more options in [SETUP](./SETUP.md)
 
 * **Changes:** yes, I keep a [CHANGELOG](./CHANGELOG.md)
 
@@ -33,12 +33,14 @@ Preview your Markdown changelogs directly in the terminal with Rich rendering:
 
 ## Introduction
 
-### What does this tool do?
+### What does this program do?
 Developer Assistant is a lightweight TUI for simplifying and managing your changelogs. You can customize the templates for **each profile** to match your existing format, and use DA as a central hub to access every changelog and project folder you maintain.
 
 You can create as many profiles as you need. Each profile gets its own **project specific** `.ini` files, created automatically through the menu based on the information you provide. These act as links that tell DA where your changelogs are, which profile owns them and what's the last version number.
 
-Your files are kept safe at all times. Before adding new changes, your existing `CHANGELOG.md` is automatically backed up. While editing, all changes are written to a temporary file first and only prepended to & replaced with your real changelog once you confirm them.
+Each project `.ini` can also hold a custom terminal command, that is run in that projects folder. So you can easly integrate updating your changelogs in DA with Git commands for example.
+
+**Your files are kept safe at all times.** Before adding new changes, your existing `CHANGELOG.md` is automatically backed up. While editing, all changes are written to a temporary file first and only prepended to & replaced with your real changelog once you confirm them.
 
 ---
 
@@ -60,7 +62,7 @@ Don't change the folder structure or modify variable names inside `.ini` files.
 The `da-ui/` folder and subfolders will be created automatically.
 
 > [!TIP] 
-> You can access its content quickly when going to: `Main menu / Settings`
+> You can access its contents quickly when going to: `Main menu / Settings`
 
 **Profiles for seperate projects and templates**
 
@@ -90,7 +92,7 @@ The `Projects/` folder holds the `.ini` files you create when starting a new pro
 
 [Project.ini example](./documents/project-example.ini)
 
-The `command` variable is a custom command that DA will run in your project folder once you choose "Format & commit" in `Main menu / Projects / Project menu / Changelog`. Even when provided, it is **not** run without your confirmation, first it's printed with the folder name and you can choose to skip it.
+The `command` variable is a custom command that DA will run in your project folder once you choose "Format & commit" in `Main menu / Projects / Project menu / Changelog`. Even if provided, it is **not** run without your confirmation, first it's printed with the folder name and you can choose to skip it.
 
 `owner` & `edited` are filled out automatically when a new project is created and `edited` updates with every changelog update.
 

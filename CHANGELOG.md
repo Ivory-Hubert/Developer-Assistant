@@ -6,6 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 DA assures the format stays consistent.
 
+## [0.3.6] - 2026-03-21
+
+### Added
+- **Delete profile option**
+
+Added a controlled in-app option that prevents deleting the Default profile. If the user manually deletes the Default profile, it will be recreated on the next launch. The Default profile is needed as a fallback option if the user deletes the profile they're currently using, but the fallback won't work if it's already gone.
+
+- **UI cleanup on exit**
+
+I personally got annoyed by the messy menu that remained on screen when exiting, and it's unprofessional to leave it like that. I realised my mistake so I added the cleanup. Should have thought about it earlier.
+
+### Changed
+- **Sleep times**
+
+One-second timers to read shorter errors and messages is heavy friction, so I shortened them.
+
+- **UI lists**
+
+The lists for profiles and profile projects were just one coloured string, but it looks nicer if the hyphen is white and only the name is coloured.
+
+### Fixed
+- **Repeating memory instructions**
+
+With the addition of the "Delete a profile" option, I realised I was repeating myself in `Interface()`, so I made a `load_profile()` function and had the three profile-related options call this function to reload the memory with a new profile.
+
+
 ## [0.3.5] - 2026-03-19
 
 ### Added

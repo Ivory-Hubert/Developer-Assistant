@@ -2,7 +2,7 @@
 
 ## Installing from PyPI
 
-The program is designed for minimal friction and simple setup. Only installation is required, on first run DA will create local user data automatically. The same process is used for new profiles.
+The program is designed for minimal friction and simple setup. Only installation is required, on first run DA will create local user data automatically. The same automatic process is used for creating new profiles.
 
 **Using uv:**
 `uv tool install developer-assistant`
@@ -18,6 +18,8 @@ The program is designed for minimal friction and simple setup. Only installation
 > Avoid using `sudo pip install` because it installs into the system Python.
 If you want a system‑wide install, use the uv method or use `pip install --user`
 
+---
+
 ## Updating DA
 Two possibilities, depending on how you installed.
 
@@ -28,13 +30,16 @@ B. **Using pip:** `python -m pip install -U developer-assistant`
 
 ## Introduction
 
-### What does this tool do?
+### What does this program do?
 Developer Assistant is a lightweight TUI for simplifying and managing your changelogs. You can customize the templates for **each profile** to match your existing format, and use DA as a central hub to access every changelog and project folder you maintain.
 
 You can create as many profiles as you need. Each profile gets its own **project specific** `.ini` files, created automatically through the menu based on the information you provide. These act as links that tell DA where your changelogs are, which profile owns them and what's the last version number.
 
-Your files are kept safe at all times. Before adding new changes, your existing `CHANGELOG.md` is automatically backed up. While editing, all changes are written to a temporary file first and only prepended to & replaced with your real changelog once you confirm them.
+Each project `.ini` can also hold a custom terminal command, that is run in that projects folder. So you can easly integrate updating your changelogs in DA with Git commands for example.
 
+**Your files are kept safe at all times.** Before adding new changes, your existing `CHANGELOG.md` is automatically backed up. While editing, all changes are written to a temporary file first and only prepended to & replaced with your real changelog once you confirm them.
+
+---
 
 ### Using the program.
 1. **What *not* to do**
@@ -53,13 +58,13 @@ Don't change the folder structure or modify variable names inside `.ini` files.
 
 The `da-ui/` folder and subfolders will be created automatically.
 
-You can access its content quickly when going to: `Main menu / Settings`
+> **Tip:** You can access its content quickly when going to: `Main menu / Settings`
 
 **Profiles for seperate projects and templates**
 
 The program comes with the "Default" profile, you can choose to either stick with this one or create your own profiles in `Main menu / Profiles`. Each profile has seperate projects and they can't be accessed by other profiles. You can choose to customize the templates seperately too.
 
-Migrating a project or template from one profile to another is currently manual, **make sure to also change the "*owner*" value in `.ini` files accordingly**.
+> **Note:** Migrating a project or template from one profile to another is currently manual, **make sure to also change the "*owner*" value in `.ini` files accordingly**.
 
 ---
 
@@ -116,8 +121,9 @@ The `memory.ini` file does exactly what you'd expect, it features:
 
 Last project & active profile get updated automatically, the rest are up to you.
 
-**`Ctrl+C` works everywhere to quickly exit DA.**
+> **Tip:** `Ctrl+C` works everywhere to quickly exit DA.
 
+---
 
 ### Setting up the test project
 For a dummy changelog to experiment with, navigate to `Main menu / Projects`, choose `test-project`, then choose option `3.` to start adjusting this projects paths. **Before setting up your own profile don't change "*Default*"**

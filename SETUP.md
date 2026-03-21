@@ -1,6 +1,6 @@
 # Setup instructions
 
-The program is designed for minimal friction and simple setup. Only installation is required, on first run DA will create local user data automatically. The same process is used for new profiles.
+The program is designed for minimal friction and simple setup. Only installation is required, on first run DA will create local user data automatically. The same automatic process is used for creating new profiles.
 
 ## Installing from PyPI (easiest and recommended):
 **Using uv:**
