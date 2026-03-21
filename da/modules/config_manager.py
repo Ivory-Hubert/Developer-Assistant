@@ -114,24 +114,40 @@ class ConfigManager:
 
     def data_check(self):
         internal_dir = Path(__file__).resolve().parents[1]
-        default_profile = self.profile_dir / "Default"
-        default_profile.mkdir(parents=True, exist_ok=True)
+        default_templates = resources.files("da.templates")
+
+        messages = []
+        #==Always ensure fallback profile exists, not just on first run==
+        if not (self.profile_dir / "Default").exists():
+            default = self.profile_dir / "Default"
+            default.mkdir()
+
+            templates = default / "Templates"
+            templates.mkdir()
+
+            projects = default / "Projects"
+            projects.mkdir()
+
+            for item in default_templates.iterdir():
+                dest = templates / item.name
+                if not dest.exists():
+                    shutil.copy(item, dest)
+
+            messages.append("Restored the Default profile")
 
         old_memory = internal_dir / "memory.ini"
         old_projects = self.global_dir / "Projects"
 
-        messages = []
-
         if old_memory.exists() and not self.memory_ini.exists():
             shutil.move(str(old_memory), str(self.memory_ini))
-            messages.append(f"Migrated memory.ini to {self.global_dir}")
+            messages.append(f"Migrated memory.ini to: {self.global_dir}")
 
         if old_projects.exists() and not self.projects_folder.exists():
             shutil.move(str(old_projects), str(self.projects_folder))
-            messages.append(f"Migrated Projects folder to {self.projects_folder}")
+            messages.append(f"Migrated Projects folder to: {self.projects_folder}")
 
+        #==Always ensure default templates exist, no matter what profile is active==
         if not self.templates_folder.exists():
-            default_templates = resources.files("da.templates")
             user_templates = self.templates_folder
 
             user_templates.mkdir(parents=True, exist_ok=True)
@@ -141,7 +157,7 @@ class ConfigManager:
                 if not dest.exists():
                     shutil.copy(item, dest)
 
-            messages.append(f"Copied default Templates to {self.templates_folder}")
+            messages.append(f"Copied default Templates to: {self.templates_folder}")
 
         return messages
 

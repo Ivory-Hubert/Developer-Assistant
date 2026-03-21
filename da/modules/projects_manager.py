@@ -78,7 +78,7 @@ class ProjectsManager:
             else:
                 print("")
                 print(colored("Unknown option...", "light_red", attrs=["bold"]))
-                time.sleep(1)
+                time.sleep(0.5)
 
     def new_project(self):
         os.system(self.clear)
@@ -143,7 +143,7 @@ class ProjectsManager:
 
             print("Your projects:")
             for name in projects:
-                print(colored(f" - {name}", f"{self.color}"))
+                print(" -" + colored(f" {name}", f"{self.color}"))
 
             project = input("\nProject name > ").strip()
 
@@ -152,9 +152,8 @@ class ProjectsManager:
             elif project in projects:
                 self.load_project(project)
             else:
-                print("")
-                print(colored("Unknown option...", "light_red", attrs=["bold"]))
-                time.sleep(1)
+                print(colored("\nInvalid name!", "light_red", attrs=["bold"]))
+                time.sleep(0.5)
             
     def load_project(self, project):
         version_logic = VersionLogic(
@@ -176,7 +175,7 @@ class ProjectsManager:
                 setting = load_manager.load_project()
             except KeyError:
                 print(colored(f"\nCan't find {project}.ini", "light_red"))
-                time.sleep(1)
+                time.sleep(0.5)
                 return
 
             edited = setting.get('edited')
@@ -241,7 +240,7 @@ class ProjectsManager:
 
         if not has_bak:
             print(colored(f"\nCan't find any .bak files for {project}", "yellow"))
-            time.sleep(1)
+            time.sleep(0.5)
             return
 
         bak = has_bak[0]

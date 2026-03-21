@@ -9,7 +9,7 @@ class Opener:
     def open(path):
         if not os.path.exists(path):
             print(colored("\nThis path does not exist.", "light_red"))
-            time.sleep(1)
+            time.sleep(0.5)
             return
         else:
             system = platform.system()

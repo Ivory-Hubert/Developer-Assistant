@@ -102,7 +102,7 @@ class VersionLogic:
             else:
                 print("")
                 print(colored("Unknown option...", "light_red", attrs=["bold"]))
-                time.sleep(1)
+                time.sleep(0.5)
             
     def finalise(self):
         with open(self.changelog_path, "r", encoding="utf-8") as f:
@@ -212,7 +212,7 @@ class VersionLogic:
             else:
                 print("")
                 print(colored("Unknown option...", "light_red", attrs=["bold"]))
-                time.sleep(1)
+                time.sleep(0.5)
 
     def prepend_changes(self):
         header = f"### {self.change_type}"
@@ -249,7 +249,7 @@ class VersionLogic:
             with open(self.templog_path, "a", encoding="utf-8") as f:
                 f.write(rendered + "\n")
 
-            choice = input("\nNew type [E] or add more [Enter] > ")
+            choice = input("\nNew type [E] or add more [Enter] > ").strip()
             if choice.lower() == "e":
                 return
 
@@ -268,7 +268,7 @@ class VersionLogic:
             self.view_md(templog_content, message)
         else:
             print(colored("No changes added.", "light_red"))
-            time.sleep(1)
+            time.sleep(0.5)
             return
 
         choice = input("\nContinue" + colored("[Enter]", f"{self.color}") + " or add more" + colored("[E] ", f"{self.color}"))
@@ -331,7 +331,7 @@ class VersionLogic:
             self.config.update_memory("ITEMS", "last_project", self.active_project)
 
         print(colored("\nChangelog updated, returning...", f"{self.color}"))
-        time.sleep(2)
+        time.sleep(1.5)
         return
 
     def view_md(self, log_content, message=None):
@@ -370,7 +370,7 @@ class VersionLogic:
 
         if size > max_size:
             print(colored(f"\nChangelog too large to load safely: {size_mb:.2f} MB", "light_red"))
-            time.sleep(2)
+            time.sleep(1.5)
             return "reject"
 
         elif size > print_size:
