@@ -1,7 +1,6 @@
 import os, sys
 import time
 import subprocess
-import platform
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -15,6 +14,7 @@ from rich.markdown import Markdown
 from da.modules.config_manager import ConfigManager
 from da.modules.opener import Opener
 
+
 class VersionLogic:
     def __init__(self, config, color, header, cls, user_path):
         self.config = config
@@ -26,6 +26,7 @@ class VersionLogic:
         self.memory = self.config.load_memory()
         self.console = Console()
     
+
     def project_menu(self, project, profile):
         self.active_project = project
         self.active_profile = profile
@@ -47,12 +48,17 @@ class VersionLogic:
             self.prj_path = Path(self.setting.get('path'))
 
             os.system(self.clear)
-            print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Projects / Project menu / Changelog")
+            print(
+                colored(f"{self.active_profile}", f"{self.color}")
+                + " / Main menu / Projects / Project menu / Changelog"
+            )
             print(self.header)
-            print("E. Back\n")
+            print("Q. Back\n")
+
             print(colored("Chosen project:", attrs=["underline"]))
             print(colored(self.active_project, f"{self.color}"))
             print("Version: " + colored(self.prj_ver, f"{self.color}"))
+
             print("\n1. Format & commit")
             print("2. Add new changes")
             print("\n3. Open the changelog")
@@ -60,7 +66,7 @@ class VersionLogic:
 
             choice = input(f"{self.user_path}> ").strip()
 
-            if choice.lower() == "e":
+            if choice.lower() == "q":
                 return
 
             elif choice == "1":
@@ -72,7 +78,7 @@ class VersionLogic:
 
             elif choice == "2":
                 if not os.path.exists(self.prj_path):
-                    print(colored("\nSystem cannot find the path to this project.", "light_red"))
+                    print(colored("\nSystem cannot find the project path.", "light_red"))
                     time.sleep(1)
                 else:
                     self.update_changelog()
@@ -100,8 +106,7 @@ class VersionLogic:
                     self.view_md(log_content)
 
             else:
-                print("")
-                print(colored("Unknown option...", "light_red", attrs=["bold"]))
+                print(colored("\nUnknown option...", "light_red", attrs=["bold"]))
                 time.sleep(0.5)
             
     def finalise(self):
@@ -130,12 +135,12 @@ class VersionLogic:
         cmd = self.setting.get('command')
 
         if cmd.strip():
-            print("\nwill run: " + colored(f"{cmd}", f"{self.color}"))
-            print("in folder: " + colored(f"{self.prj_path}", f"{self.color}"))
-            confirm = input("\nConfirm[Enter] or abort[E] > ").strip()
+            print("\nWill run: " + colored(f"{cmd}", f"{self.color}"))
+            print("In folder: " + colored(f"{self.prj_path}", f"{self.color}"))
+            confirm = input("\nConfirm[Enter] or abort[Q] > ").strip()
             print("")
 
-            if confirm.lower() == "e":
+            if confirm.lower() == "q":
                 return
             try:
                 subprocess.run(cmd, cwd=self.prj_path, shell=True, check=True)
@@ -160,11 +165,20 @@ class VersionLogic:
         self.comment = None
         while True:
             os.system(self.clear)
-            print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Projects / Project menu / Changelog / Add changes")
+            print(
+                colored(f"{self.active_profile}", f"{self.color}")
+                + " / Main menu / Projects / Project menu / Changelog / Add changes"
+            )
             print(self.header)
-            print("E. Back/abort")
+            print("Q. Back (stash/abort)")
             print("O. Open templog for fixes")
             print("S. Review changes & save\n")
+
+            if os.path.exists(self.templog_path):
+                print(
+                    colored("There are unsaved changes for a project.\n", "light_yellow", attrs=["bold"])
+                    + "(Open templog to review)\n"
+                )
 
             print(colored("Chosen project:", attrs=["underline"]))
             print(colored(self.active_project, f"{self.color}"))
@@ -186,7 +200,7 @@ class VersionLogic:
                 print("Change: " + self.change)
                 print("Comment: " + self.comment + "\n")
 
-            type_choice = input(f"{self.user_path}> ").strip()
+            type_choice = input(f"{self.user_path}> ").strip().lower()
 
             type_map = {
                 "1": "Added",
@@ -199,19 +213,30 @@ class VersionLogic:
 
             self.change_type = type_map.get(type_choice.lower())
 
-            if type_choice.lower() == "e":
+            if type_choice == "q":
                 if os.path.exists(self.templog_path):
-                    os.remove(self.templog_path)
+                    print(colored("\nNote: This stash slot is shared between all projects.", "light_yellow"))
+                    choice = input(
+                        colored("\nK", "light_red")
+                        + "eep or "
+                        + colored("D", "light_red")
+                        + "iscard changes? > "
+                    ).strip().lower()
+
+                    if choice == "d":
+                        os.remove(self.templog_path)
                 return
+
             elif type_choice in ("1", "2", "3", "4", "5", "6"):
                 self.prepend_changes()
-            elif type_choice.lower() == "o":
+
+            elif type_choice == "o":
                 Opener.open(self.templog_path)
-            elif type_choice.lower() == "s":
+
+            elif type_choice == "s":
                 self.save_changes()
             else:
-                print("")
-                print(colored("Unknown option...", "light_red", attrs=["bold"]))
+                print(colored("\nUnknown option...", "light_red", attrs=["bold"]))
                 time.sleep(0.5)
 
     def prepend_changes(self):
@@ -249,8 +274,8 @@ class VersionLogic:
             with open(self.templog_path, "a", encoding="utf-8") as f:
                 f.write(rendered + "\n")
 
-            choice = input("\nNew type [E] or add more [Enter] > ").strip()
-            if choice.lower() == "e":
+            choice = input("\nNew type[Q] or add more[Enter] > ").strip()
+            if choice.lower() == "q":
                 return
 
     def save_changes(self):
@@ -271,13 +296,16 @@ class VersionLogic:
             time.sleep(0.5)
             return
 
-        choice = input("\nContinue" + colored("[Enter]", f"{self.color}") + " or add more" + colored("[E] ", f"{self.color}"))
+        choice = input(
+            "\nContinue" + colored("[Enter]", f"{self.color}")
+            + " or add more" + colored("[Q] ", f"{self.color}")
+        )
 
-        if choice.lower() == "e":
+        if choice.lower() == "q":
             return
 
         print("\nCurrent version: " + colored(self.prj_ver, f"{self.color}"))
-        version = input("\nNew version number: ").strip()
+        version = input("\nNew version number > ").strip()
 
         print("\nWorking...")
 
@@ -335,14 +363,17 @@ class VersionLogic:
         return
 
     def view_md(self, log_content, message=None):
+        # Callers: self.project_menu() & self.save_changes()
         flag = 0
         if not message:
+            # Only check size when caller is self.project_menu()
             method = self.check_size()
             if method == "reject":
                 return
             elif method == "print":
                 flag = 1
 
+        # Display the passed down message or full UI
         if message:
             print(message)
         else:
@@ -350,15 +381,23 @@ class VersionLogic:
             print(self.header)
             print("")
 
+        # Respect self.check_size() verdict
         if flag:
-            print(log_content)
+            with self.console.pager():
+                self.console.print(log_content)
+
             print(colored("\nThis log is too large to render in Markdown! (Max 10MB)", "yellow"))
+            input("\nReturn...[Enter]")
+            return
         else:
             md = Markdown(log_content)
             self.console.print(md)
 
         if not message:
-            input("\nReturn..." + colored("[Enter]", f"{self.color}"))
+            choice = input("\nReturn...[Enter] / [P]ager view (Q - return) > ").strip().lower()
+            if choice == "p":
+                with self.console.pager():
+                    self.console.print(md)
         return
 
     def check_size(self):

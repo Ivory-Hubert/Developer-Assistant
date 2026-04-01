@@ -1,8 +1,10 @@
+import os
 import subprocess
 import platform
-import os
 import time
+
 from termcolor import colored
+
 
 class Opener:
     @staticmethod

@@ -9,6 +9,7 @@ from platformdirs import user_config_path
 
 from importlib import resources
 
+
 class ConfigManager:
     def __init__(self, config_file, profile=None):
         if not profile:
@@ -29,6 +30,7 @@ class ConfigManager:
         self.new_project_ini = self.projects_folder / config_file
 
         self.update_last_project = Path(config_file).stem
+
 
     def load_memory(self):
         self.config.read(self.memory_ini)
@@ -117,7 +119,8 @@ class ConfigManager:
         default_templates = resources.files("da.templates")
 
         messages = []
-        #==Always ensure fallback profile exists, not just on first run==
+
+        # Always ensure fallback profile exists, not just on first run
         if not (self.profile_dir / "Default").exists():
             default = self.profile_dir / "Default"
             default.mkdir()
@@ -146,7 +149,7 @@ class ConfigManager:
             shutil.move(str(old_projects), str(self.projects_folder))
             messages.append(f"Migrated Projects folder to: {self.projects_folder}")
 
-        #==Always ensure default templates exist, no matter what profile is active==
+        # Always ensure default templates exist, no matter what profile is active
         if not self.templates_folder.exists():
             user_templates = self.templates_folder
 

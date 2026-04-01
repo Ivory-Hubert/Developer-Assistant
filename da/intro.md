@@ -31,14 +31,14 @@ Don't change the folder structure or modify variable names inside `.ini` files.
 
 The `da-ui/` folder and subfolders will be created automatically.
 
-> Tip:
+> **Tip:**
 > You can access its content quickly when going to: `Main menu / Settings`
 
 **Profiles for seperate projects and templates**
 
 The program comes with the "Default" profile, you can choose to either stick with this one or create your own profiles in `Main menu / Profiles`. Each profile has seperate projects and they can't be accessed by other profiles. You can choose to customize the templates seperately too.
 
-> Note:
+> **Note:**
 > Migrating a project or template from one profile to another is currently manual, **make sure to also change the "*owner*" value in `.ini` files accordingly**.
 
 ---
@@ -74,6 +74,11 @@ New changes are first written to a temporary file and only prepended to & replac
 This ensures your existing changelog is never overwritten or corrupted, and you always have a fallback copy.
 If the temporary changelog is present on startup you are prompted to remove or keep it.
 
+Furthermore, you can safely work on one changelog in separate sessions, your changes are staged in the temporary log file and only deleted with your confirmation. 
+
+> **Note:**
+> DA can only keep **one** projects WIP changes staged, switching projects with staged changes appends the same file. If you update/reinstall the program with unsaved changes they are lost for good, so it's **not** long-term storage.
+
 
 **Ease of navigation**
 
@@ -94,4 +99,5 @@ The `memory.ini` file does exactly what you'd expect, it features:
 
 Last project & active profile get updated automatically, the rest are up to you.
 
-> **`Ctrl+C` works everywhere to quickly exit DA.**
+> **Tip:**
+> `Ctrl+C` works everywhere to quickly exit DA.

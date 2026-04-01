@@ -1,33 +1,33 @@
 ﻿import os, sys
-import time
 import platform
-import subprocess
 import shutil
+import time
+from importlib import resources
 from pathlib import Path
 
-from termcolor import colored
-from rich.progress import track
 from rich.console import Console
 from rich.markdown import Markdown
+from rich.progress import track
+from termcolor import colored
 
-from da.modules.projects_manager import ProjectsManager
 from da.modules.config_manager import ConfigManager
 from da.modules.opener import Opener
-from importlib import resources
+from da.modules.projects_manager import ProjectsManager
+
 
 class Interface:
     def __init__(self):
-        self.version = "0.3.6"
-        self.clear = 'cls' if platform.system() == 'Windows' else 'clear'
+        self.version = "0.3.7"
+        self.clear = "cls" if platform.system() == "Windows" else "clear"
 
         title = f"DA - {self.version}"
 
         if platform.system() == "Windows":
-            os.system(f'title {title}')
+            os.system(f"title {title}")
         else:
-            print(f'\33]0;{title}\a', end='', flush=True)
+            print(f"\33]0;{title}\a", end="", flush=True)
 
-        self.config = ConfigManager('memory.ini', profile="Default")
+        self.config = ConfigManager("memory.ini", profile="Default")
 
         self.memory = None
         self.color = None
@@ -35,11 +35,12 @@ class Interface:
         self.user_path = None
 
         self.first_run = False
-    
+
+
     def run(self):
         steps = [
             ("Initializing runtime...", self.runtime_init),
-            ("Checking configuration...", self.config.data_check)
+            ("Checking configuration...", self.config.data_check),
         ]
 
         for label, step in track(steps):
@@ -57,8 +58,13 @@ class Interface:
         if os.path.exists(temp_log):
             while True:
                 os.system(self.clear)
-                print(colored(f"Temporary changelog detected from your last session!\n", "yellow"))
-                print(colored("D", "light_red") + "elete or " + colored("K", "light_red") + "eep?\n")
+                print(colored("Unsaved changes detected from your last session!\n", "yellow",))
+                print(
+                    colored("D", "light_red")
+                    + "elete or "
+                    + colored("K", "light_red")
+                    + "eep?\n"
+                )
                 choice = input(f"{self.user_path}> ").lower()
                 if choice == "d":
                     os.remove(temp_log)
@@ -68,7 +74,7 @@ class Interface:
                 else:
                     print(colored("\nPlease make a valid choice.", "light_red"))
                     time.sleep(0.5)
-        
+
         state = "intro" if self.first_run else "menu"
 
         while state != "exit":
@@ -90,22 +96,26 @@ class Interface:
                     state = "exit"
 
     def menu(self):
-        self.active_profile = self.memory.get('profile')
+        self.active_profile = self.memory.get("profile")
+        last_project = self.memory.get("last_project")
 
         projects_manager = ProjectsManager(
             config=self.config,
             color=self.color,
             header=self.header,
             cls=self.clear,
-            user_path=self.user_path
+            user_path=self.user_path,
         )
 
-        last_project = self.memory.get('last_project')
         while True:
             os.system(self.clear)
-            print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu")
+            print(
+                colored(
+                f"{self.active_profile}", f"{self.color}")
+                + " / Main menu"
+            )
             print(self.header)
-            print("E. Exit\n")
+            print("Q. Exit\n")
             print("Last project:")
             print(colored(last_project, f"{self.color}"))
             print("\n1. Projects")
@@ -114,7 +124,7 @@ class Interface:
 
             choice = input(f"{self.user_path}> ").strip()
 
-            if choice.lower() == "e":
+            if choice.lower() == "q":
                 os.system(self.clear)
                 print(self.header)
                 print("Bye!")
@@ -130,16 +140,18 @@ class Interface:
             elif choice == "3":
                 return "settings"
             else:
-                print("")
-                print(colored("Unknown option...", "light_red", attrs=["bold"]))
+                print(colored("\nUnknown option...", "light_red", attrs=["bold"]))
                 time.sleep(0.5)
-    
+
     def settings(self):
         while True:
             os.system(self.clear)
-            print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Settings")
+            print(
+                colored(f"{self.active_profile}", f"{self.color}")
+                + " / Main menu / Settings"
+            )
             print(self.header)
-            print("E. Back\n")
+            print("Q. Back\n")
 
             print(colored("Configuration options", attrs=["underline"]))
             print("1. Edit pinned projects [WIP]")
@@ -152,12 +164,12 @@ class Interface:
 
             choice = input(f"{self.user_path}> ").strip()
 
-            if choice.lower() == "e":
+            if choice.lower() == "q":
                 return
-            #elif choice == "1":
-                #pass
-            #elif choice == "2":
-                #pass
+            # elif choice == "1":
+            # pass
+            # elif choice == "2":
+            # pass
             elif choice == "3":
                 Opener.open(self.config.memory_ini)
             elif choice == "4":
@@ -165,16 +177,18 @@ class Interface:
             elif choice == "5":
                 Opener.open(self.config.templates_folder)
             else:
-                print("")
-                print(colored("Unknown option...", "light_red", attrs=["bold"]))
+                print(colored("\nUnknown option...", "light_red", attrs=["bold"]))
                 time.sleep(0.5)
 
     def profiles(self):
         while True:
             os.system(self.clear)
-            print(colored(f"{self.active_profile}", f"{self.color}") + " / Main menu / Profiles")
+            print(
+                colored(f"{self.active_profile}", f"{self.color}")
+                + " / Main menu / Profiles"
+            )
             print(self.header)
-            print("E. Back\n")
+            print("Q. Back\n")
 
             print("1. Switch profiles\n")
 
@@ -183,7 +197,7 @@ class Interface:
 
             choice = input(f"{self.user_path}> ").strip()
 
-            if choice.lower() == "e":
+            if choice.lower() == "q":
                 return
             elif choice == "1":
                 self.switch_profile()
@@ -192,8 +206,7 @@ class Interface:
             elif choice == "3":
                 self.delete_profile()
             else:
-                print("")
-                print(colored("Unknown option...", "light_red", attrs=["bold"]))
+                print(colored("\nUnknown option...", "light_red", attrs=["bold"]))
                 time.sleep(0.5)
 
     def switch_profile(self):
@@ -259,11 +272,11 @@ class Interface:
 
         self.memory = self.config.load_memory()
 
-        profile = self.memory.get('profile')
+        profile = self.memory.get("profile")
         self.config = ConfigManager("memory.ini", profile=profile)
 
         self.memory = self.config.load_memory()
-        self.active_profile = self.memory.get('profile')
+        self.active_profile = self.memory.get("profile")
 
     def runtime_init(self):
         if not self.config.memory_ini.exists():
@@ -276,10 +289,11 @@ class Interface:
         self.config = ConfigManager("memory.ini", profile=active_profile)
         self.memory = self.config.load_memory()
 
-        self.color = self.memory.get('color') or "light_blue"
-        self.user_path = os.environ.get('USERPROFILE') or os.environ.get('HOME', 'User')
+        self.color = self.memory.get("color") or "light_blue"
+        self.user_path = os.environ.get("USERPROFILE") or os.environ.get("HOME", "User")
 
-        brand = (colored(" Developer Assistant ", f"{self.color}"))
+
+        brand = colored(" Developer Assistant ", f"{self.color}")
         text = " Developer Assistant "
 
         columns, _ = shutil.get_terminal_size()
@@ -289,7 +303,7 @@ class Interface:
         self.header = f"{bars}{brand}{bars}"
 
     def local_init(self):
-        #==Works together with ConfigManager.data_check==
+        # Works together with ConfigManager.data_check()
         default_files = resources.files("da.default")
         dest = self.config.memory_ini
 
@@ -306,7 +320,11 @@ class Interface:
 
     def intro(self):
         os.system(self.clear)
-        print(colored("Welcome to the Developer Assistant\n", f"{self.color}", attrs=["bold"]))
+        print(
+            colored("Welcome to the Developer Assistant\n",
+            f"{self.color}", attrs=["bold"]
+            )
+        )
         print("Here's everything you need to get started...\n")
 
         time.sleep(2)
@@ -319,13 +337,40 @@ class Interface:
 
         input("\nContinue..." + colored("[Enter]", f"{self.color}"))
 
+        # [WIP code, implementation could change]
+
+        # print(colored("\nChoose an accent colour.\n", attrs=["underline"]))
+        # print("1. Default - " + colored("light blue", f"{self.color}"))
+        #
+        # print("\n2. " + colored("red", "red"))
+        # print("3. " + colored("green", "green"))
+        # print("4. " + colored("blue", "blue"))
+        # print("5. " + colored("yellow", "yellow"))
+        # print("6. " + colored("cyan", "cyan"))
+        # print("7. " + colored("magenta", "magenta"))
+        #
+        # print("\n8. " + colored("light green", "light_green"))
+        # print("9. " + colored("light yellow", "light_yellow"))
+        # print("10. " + colored("light magenta", "light_magenta"))
+        # print("11. " + colored("light cyan", "light_cyan"))
+        #
+        # choice = input("\nChoice > ").strip()
+        #
+        # key_map = {
+        #     "1": "",
+        #     "2": "red",
+        # }
+
 def main():
     try:
         app = Interface()
         app.run()
         os.system(app.clear)
     except KeyboardInterrupt:
-        print("\n\n" + colored("Execution interrupted. Exiting...", "cyan", attrs=["bold"]))
+        print(
+            "\n\n"
+            + colored("Execution interrupted. Exiting...", "cyan", attrs=["bold"])
+        )
         time.sleep(0.5)
         os.system(app.clear)
         sys.exit(0)
