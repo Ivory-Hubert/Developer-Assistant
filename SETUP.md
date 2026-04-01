@@ -50,7 +50,7 @@ This creates a local environment and installs all required dependencies.
 
 **Now you can run the program from the root folder like this:**
 
-2. `uv run -m da.interface`
+2. `uv run -m da.interface` & `make run`
 
 > [!NOTE]
 > You can then also create an `interface.py` shortcut to use the program. (*Icons included.*) Do note that in this case the program will also run from the repo folder, not system-wide.
