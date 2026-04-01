@@ -17,7 +17,7 @@ Interface does not know how modules handle their tasks, VersionLogic and Project
 Modules always return to the caller.
 1. Interface - the base of the stack
 2. ProjectsManager - pushed onto the stack when "Projects" is selected
-3. VersionLogic - pushed onto the stack once a sepcific project is chosen
+3. VersionLogic - pushed onto the stack once a specific project is chosen
 
 * Hierarchical State Machine
 Why this approach?
@@ -55,6 +55,7 @@ Projects     <--->     Settings       <--->      Profiles
 				            in the project folder.
 			                Update individual
 			                changelogs.
+			                Preview/view .md changelogs
 ===============================================================================
 Users local data folder structure:
 memory.ini -> last project; pinned projects; active profile; color preference

@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 DA assures the format stays consistent.
 
+## [0.3.7] - 2026-04-01
+
+### Added
+- **Keep the Changelog**
+
+I identified an UX disaster, users can now keep the temporary log, where changes are staged, before leaving via menu. It was already preserved when exiting with `Ctrl+C`. **And** if one enters the "Add changes" menu with this templog present, they are warned. That's *quite* useful for not overwriting anything important in the event of a crash (*OS of course, not da-ui!*)
+
+- **Pager view**
+
+There is now an option to view changelogs with a pager, along with the default Markdown view. That's great if the changelog is getting long. Now with over `10MB` changelogs the pager view is forced, faster & more useful for actually viewing such a behemoth.
+
+### Changed
+- **UI updates**
+
+Changed quite miniscule wording in a couple of places, removed the cloud backup choice from the menu, for now. More importantly, I realised how unorthodox my previous choice of using "E" to `return` & `exit` was, so I swapped those out for the more standard "Q".
+
+- **Code quality**
+
+Now that heavy feature updates are winding down a bit, I took some time to add a couple of comments to more appropriate places. I also changed the visual appearance, by breaking down long strings to take up more lines, rather than screen width. Also discovered leftover imports in some modules, those were remnants of days when I identified platforms in other modules, besides `interface.py` & `opener.py`.
+
+
 ## [0.3.6] - 2026-03-21
 
 ### Added

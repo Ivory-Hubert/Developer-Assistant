@@ -38,7 +38,7 @@ Developer Assistant is a lightweight TUI for simplifying and managing your chang
 
 You can create as many profiles as you need. Each profile gets its own **project specific** `.ini` files, created automatically through the menu based on the information you provide. These act as links that tell DA where your changelogs are, which profile owns them and what's the last version number.
 
-Each project `.ini` can also hold a custom terminal command, that is run in that projects folder. So you can easly integrate updating your changelogs in DA with Git commands for example.
+Each project `.ini` can also hold a custom terminal command, that's run in the projects folder. So you can easly integrate updating your changelogs in DA with Git commands for example.
 
 **Your files are kept safe at all times.** Before adding new changes, your existing `CHANGELOG.md` is automatically backed up. While editing, all changes are written to a temporary file first and only prepended to & replaced with your real changelog once you confirm them.
 
@@ -105,6 +105,11 @@ New changes are first written to a temporary file and only prepended to & replac
 
 This ensures your existing changelog is never overwritten or corrupted, and you always have a fallback copy.
 If the temporary changelog is present on startup you are prompted to remove or keep it.
+
+Furthermore, you can safely work on one changelog in separate sessions, your changes are staged in the temporary log file and only deleted with your confirmation. 
+
+> [!NOTE]
+> DA can only keep **one** projects WIP changes staged, switching projects with staged changes appends the same file. If you update/reinstall the program with unsaved changes they are lost for good, so it's **not** long-term storage.
 
 
 **Ease of navigation**
