@@ -9,26 +9,34 @@ from termcolor import colored
 from da.modules.config_manager import ConfigManager
 from da.modules.version_logic import VersionLogic
 from da.modules.opener import Opener
-
+from da.modules.terminal import terminal
 
 class ProjectsManager:
-    def __init__(self, config, color, header, cls, user_path):
+    def __init__(self, config):
         self.config = config
-        self.color = color
-        self.header = header
-        self.clear = cls
-        self.user_path = user_path
+        term = terminal
+        
+        self.color = term.color
+        self.header = term.header
+        self.clear = term.clear
+        self.user_path = term.user_path
+        self.yes_cursor = term.yes_cursor
+        self.no_cursor = term.no_cursor
     
 
     def projects(self, profile):
         self.active_profile = profile
         while True:
             self.memory = self.config.load_memory()
+            
+            print(self.no_cursor)
             os.system(self.clear)
+            
             print(
                 colored(f"{self.active_profile}", f"{self.color}")
                 + " / Main menu / Projects"
             )
+            
             print(self.header)
             print("Q. Back\n")
 
@@ -45,7 +53,7 @@ class ProjectsManager:
             print("\n3. Profile projects")
 
             print("")
-            choice = input(f"{self.user_path}> ").strip()
+            choice = input(f"{self.user_path}{self.yes_cursor}> ").strip()
 
             if choice.lower() == "q":
                 return
@@ -80,10 +88,13 @@ class ProjectsManager:
             elif choice == "3":
                 self.prf_projects()
             else:
-                print(colored("\nUnknown option...", "light_red", attrs=["bold"]))
+                print(self.no_cursor)
+                print(colored("Unknown option...", "light_red", attrs=["bold"]))
                 time.sleep(0.5)
 
+                
     def new_project(self):
+        print(self.no_cursor)
         os.system(self.clear)
 
         now = datetime.now()
@@ -91,12 +102,15 @@ class ProjectsManager:
 
         print(self.header)
         print("Q. Abort/back")
-        print("[*] - Optional\n")
-        
+        print("[*] - Optional")
+
+        print(self.yes_cursor)
         name = prompt("Enter new project name > ")
+        
         if name.lower() == "q":
             return
-        path = prompt("\nEnter project path > ")
+            
+        path = prompt("Enter project path > ")
 
         changelog = prompt("\nProject changelog path > ")
 
@@ -107,6 +121,7 @@ class ProjectsManager:
         #cloud = prompt("\nCloud service* > ")
 
         confirm = input("\nConfirm(Y) or abort(E) > ").strip()
+        
         if confirm.lower() == "e":
             return
             
@@ -125,19 +140,25 @@ class ProjectsManager:
             return
             
         else:
-            print(colored("\nUnknown option, try again...", "light_red", attrs=["bold"]))
+            print(self.no_cursor)
+            print(colored("Unknown option, try again...", "light_red", attrs=["bold"]))
             time.sleep(1)
             return
 
+            
     def prf_projects(self):
         while True:
+            print(self.no_cursor)
             os.system(self.clear)
+            
             print(
                 colored(f"{self.active_profile}", f"{self.color}")
                 + " / Main menu / Projects / Profile projects"
             )
+            
             print(self.header)
             print("Q. Back\n")
+            
             prof_prj = self.config.projects_folder
             contents = os.listdir(prof_prj)
 
@@ -151,24 +172,20 @@ class ProjectsManager:
             for name in projects:
                 print(" -" + colored(f" {name}", f"{self.color}"))
 
-            project = input("\nProject name > ").strip()
+            project = input(f"{self.yes_cursor}\nProject name > ").strip()
 
             if project.lower() == "q":
                 return
             elif project in projects:
                 self.load_project(project)
             else:
-                print(colored("\nInvalid name!", "light_red", attrs=["bold"]))
+                print(self.no_cursor)
+                print(colored("Invalid name!", "light_red", attrs=["bold"]))
                 time.sleep(0.5)
-            
+
+                
     def load_project(self, project):
-        version_logic = VersionLogic(
-            config=self.config,
-            color=self.color,
-            header=self.header,
-            cls=self.clear,
-            user_path=self.user_path
-        )
+        version_logic = VersionLogic(config=self.config)
 
         load_manager = ConfigManager(f"{project}.ini", profile=self.active_profile)
         project_ini_path = load_manager.projects_folder / f"{project}.ini"
@@ -183,7 +200,10 @@ class ProjectsManager:
                 print(colored(f"\nCan't find {project}.ini", "light_red"))
                 time.sleep(0.5)
                 return
-
+            
+            print(self.no_cursor)
+            os.system(self.clear)
+                
             edited = setting.get('edited')
             status = self.date_math(today, edited)
             if status == "today":
@@ -196,11 +216,11 @@ class ProjectsManager:
                 days = status
                 suffix = " days ago"
 
-            os.system(self.clear)
             print(
                 colored(f"{self.active_profile}", f"{self.color}")
                 + " / Main menu / Projects / Project menu"
             )
+            
             print(self.header)
             print("Q. Back\n")
 
@@ -215,7 +235,7 @@ class ProjectsManager:
             print("4. Restore backup changelog\n")
             # print("5. Backup to the cloud [WIP]\n")
 
-            choice = input(f"{self.user_path}> ").strip()
+            choice = input(f"{self.user_path}{self.yes_cursor}> ").strip()
 
             if choice.lower() == "q":
                 return
@@ -241,8 +261,10 @@ class ProjectsManager:
             #elif choice == "5":
 
             else:
-                print(colored("\nUnknown option...", "light_red", attrs=["bold"]))
+                print(self.no_cursor)
+                print(colored("Unknown option...", "light_red", attrs=["bold"]))
                 time.sleep(1)
+
 
     def rest_bak(self, setting, changelog, project):
         prj_path = Path(setting.get('path'))
@@ -258,6 +280,7 @@ class ProjectsManager:
         print(f"\nReplaced {bak.name} with CHANGELOG.md")
         time.sleep(1)
         return
+
 
     def date_math(self, today, edited):
         try:
@@ -275,5 +298,6 @@ class ProjectsManager:
         else:
             return dif
 
+            
 if __name__ == "__main__":
-    ProjectsManager(config, color, header, cls, user_path)
+    ProjectsManager(config)

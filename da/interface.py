@@ -1,5 +1,4 @@
-﻿import os, sys
-import platform
+import os, sys
 import shutil
 import time
 from importlib import resources
@@ -13,29 +12,25 @@ from termcolor import colored
 from da.modules.config_manager import ConfigManager
 from da.modules.opener import Opener
 from da.modules.projects_manager import ProjectsManager
-
+from da.modules.terminal import terminal
 
 class Interface:
     def __init__(self):
-        self.version = "0.3.7"
-        self.clear = "cls" if platform.system() == "Windows" else "clear"
-
-        title = f"DA - {self.version}"
-
-        if platform.system() == "Windows":
-            os.system(f"title {title}")
-        else:
-            print(f"\33]0;{title}\a", end="", flush=True)
-
         self.config = ConfigManager("memory.ini", profile="Default")
-
+        
         self.memory = None
-        self.color = None
-        self.header = None
-        self.user_path = None
-
         self.first_run = False
 
+        terminal.main()
+        term = terminal
+        
+        self.color = term.color
+        self.header = term.header
+        self.clear = term.clear
+        self.user_path = term.user_path
+        self.yes_cursor = term.yes_cursor
+        self.no_cursor = term.no_cursor
+        
 
     def run(self):
         steps = [
@@ -99,15 +94,10 @@ class Interface:
         self.active_profile = self.memory.get("profile")
         last_project = self.memory.get("last_project")
 
-        projects_manager = ProjectsManager(
-            config=self.config,
-            color=self.color,
-            header=self.header,
-            cls=self.clear,
-            user_path=self.user_path,
-        )
+        projects_manager = ProjectsManager(config=self.config)
 
         while True:
+            print(self.no_cursor)
             os.system(self.clear)
             print(
                 colored(
@@ -122,13 +112,13 @@ class Interface:
             print("2. Profiles")
             print("3. Settings\n")
 
-            choice = input(f"{self.user_path}> ").strip()
+            choice = input(f"{self.user_path}{self.yes_cursor}> ").strip()
 
             if choice.lower() == "q":
-                os.system(self.clear)
-                print(self.header)
-                print("Bye!")
-                time.sleep(1)
+                print(self.no_cursor)
+                print(colored("Bye!", f"{self.color}", attrs=["bold"]))
+                
+                time.sleep(0.5)
                 return "exit"
 
             elif choice == "1":
@@ -140,11 +130,14 @@ class Interface:
             elif choice == "3":
                 return "settings"
             else:
-                print(colored("\nUnknown option...", "light_red", attrs=["bold"]))
+                print(self.no_cursor)
+                print(colored("Unknown option...", "light_red", attrs=["bold"]))
                 time.sleep(0.5)
 
+                
     def settings(self):
         while True:
+            print(self.no_cursor)
             os.system(self.clear)
             print(
                 colored(f"{self.active_profile}", f"{self.color}")
@@ -162,7 +155,7 @@ class Interface:
             print("4. Open the Projects folder")
             print("5. Open the Templates folder\n")
 
-            choice = input(f"{self.user_path}> ").strip()
+            choice = input(f"{self.user_path}{self.yes_cursor}> ").strip()
 
             if choice.lower() == "q":
                 return
@@ -177,11 +170,14 @@ class Interface:
             elif choice == "5":
                 Opener.open(self.config.templates_folder)
             else:
-                print(colored("\nUnknown option...", "light_red", attrs=["bold"]))
+                print(self.no_cursor)
+                print(colored("Unknown option...", "light_red", attrs=["bold"]))
                 time.sleep(0.5)
 
+                
     def profiles(self):
         while True:
+            print(self.no_cursor)
             os.system(self.clear)
             print(
                 colored(f"{self.active_profile}", f"{self.color}")
@@ -195,7 +191,7 @@ class Interface:
             print("2. Create a new profile")
             print("3. Delete a profile\n")
 
-            choice = input(f"{self.user_path}> ").strip()
+            choice = input(f"{self.user_path}{self.yes_cursor}> ").strip()
 
             if choice.lower() == "q":
                 return
@@ -206,18 +202,20 @@ class Interface:
             elif choice == "3":
                 self.delete_profile()
             else:
-                print(colored("\nUnknown option...", "light_red", attrs=["bold"]))
+                print(self.no_cursor)
+                print(colored("Unknown option...", "light_red", attrs=["bold"]))
                 time.sleep(0.5)
 
+                
     def switch_profile(self):
         prof_dir = self.config.profile_dir
         contents = os.listdir(prof_dir)
 
-        print("\nYour profiles:")
+        print(f"\n{self.no_cursor}Your profiles:")
         for item in contents:
             print(" -" + colored(f" {item}", f"{self.color}"))
 
-        name = input("\nProfile name > ").strip()
+        name = input(f"\n{self.yes_cursor}Profile name > ").strip()
 
         if name in contents:
             self.load_profile(name)
@@ -248,12 +246,12 @@ class Interface:
         prof_dir = self.config.profile_dir
         contents = os.listdir(prof_dir)
 
-        print("\nYour profiles:")
+        print(f"\n{self.no_cursor}Your profiles:")
         for item in contents:
             print(" -" + colored(f" {item}", f"{self.color}"))
 
-        name = input("\nProfile name > ").strip()
-
+        name = input(f"\n{self.yes_cursor}Profile name > ").strip()
+            
         if name in contents and name != "Default":
             profiles = self.config.profile_dir
             profile = profiles / name
@@ -278,6 +276,7 @@ class Interface:
         self.memory = self.config.load_memory()
         self.active_profile = self.memory.get("profile")
 
+        
     def runtime_init(self):
         if not self.config.memory_ini.exists():
             self.local_init()
@@ -289,19 +288,7 @@ class Interface:
         self.config = ConfigManager("memory.ini", profile=active_profile)
         self.memory = self.config.load_memory()
 
-        self.color = self.memory.get("color") or "light_blue"
-        self.user_path = os.environ.get("USERPROFILE") or os.environ.get("HOME", "User")
-
-
-        brand = colored(" Developer Assistant ", f"{self.color}")
-        text = " Developer Assistant "
-
-        columns, _ = shutil.get_terminal_size()
-        pad_size = (columns - len(text)) // 2
-        bars = "=" * max(0, pad_size)
-
-        self.header = f"{bars}{brand}{bars}"
-
+        
     def local_init(self):
         # Works together with ConfigManager.data_check()
         default_files = resources.files("da.default")
@@ -318,6 +305,7 @@ class Interface:
             if item.name == "test-project.ini":
                 shutil.copy(item, dest)
 
+                
     def intro(self):
         os.system(self.clear)
         print(
@@ -365,14 +353,23 @@ def main():
     try:
         app = Interface()
         app.run()
+
+        print(app.yes_cursor)
         os.system(app.clear)
+        
     except KeyboardInterrupt:
+        print(app.no_cursor)
+        
         print(
             "\n\n"
             + colored("Execution interrupted. Exiting...", "cyan", attrs=["bold"])
         )
+        
         time.sleep(0.5)
+
+        print(app.yes_cursor)
         os.system(app.clear)
+        
         sys.exit(0)
 
 if __name__ == "__main__":

@@ -13,18 +13,22 @@ from rich.markdown import Markdown
 
 from da.modules.config_manager import ConfigManager
 from da.modules.opener import Opener
+from da.modules.terminal import terminal
 
 
 class VersionLogic:
-    def __init__(self, config, color, header, cls, user_path):
+    def __init__(self, config):
         self.config = config
-        self.color = color
-        self.header = header
-        self.clear = cls
-        self.user_path = user_path
-
         self.memory = self.config.load_memory()
-        self.console = Console()
+        
+        term = terminal
+        
+        self.color = term.color
+        self.header = term.header
+        self.clear = term.clear
+        self.user_path = term.user_path
+        self.yes_cursor = term.yes_cursor
+        self.no_cursor = term.no_cursor
     
 
     def project_menu(self, project, profile):
@@ -47,11 +51,14 @@ class VersionLogic:
             self.prj_ver = self.setting.get('version')
             self.prj_path = Path(self.setting.get('path'))
 
+            print(self.no_cursor)
             os.system(self.clear)
+
             print(
                 colored(f"{self.active_profile}", f"{self.color}")
                 + " / Main menu / Projects / Project menu / Changelog"
             )
+            
             print(self.header)
             print("Q. Back\n")
 
@@ -64,7 +71,7 @@ class VersionLogic:
             print("\n3. Open the changelog")
             print("4. Preview .md changelog\n")
 
-            choice = input(f"{self.user_path}> ").strip()
+            choice = input(f"{self.user_path}{self.yes_cursor}> ").strip()
 
             if choice.lower() == "q":
                 return
@@ -106,7 +113,8 @@ class VersionLogic:
                     self.view_md(log_content)
 
             else:
-                print(colored("\nUnknown option...", "light_red", attrs=["bold"]))
+                print(self.no_cursor)
+                print(colored("Unknown option...", "light_red", attrs=["bold"]))
                 time.sleep(0.5)
             
     def finalise(self):
@@ -164,11 +172,14 @@ class VersionLogic:
         self.change = None
         self.comment = None
         while True:
+            print(self.no_cursor)
             os.system(self.clear)
+            
             print(
                 colored(f"{self.active_profile}", f"{self.color}")
                 + " / Main menu / Projects / Project menu / Changelog / Add changes"
             )
+            
             print(self.header)
             print("Q. Back (stash/abort)")
             print("O. Open templog for fixes")
@@ -200,7 +211,7 @@ class VersionLogic:
                 print("Change: " + self.change)
                 print("Comment: " + self.comment + "\n")
 
-            type_choice = input(f"{self.user_path}> ").strip().lower()
+            type_choice = input(f"{self.user_path}{self.yes_cursor}> ").strip()
 
             type_map = {
                 "1": "Added",
@@ -236,7 +247,8 @@ class VersionLogic:
             elif type_choice == "s":
                 self.save_changes()
             else:
-                print(colored("\nUnknown option...", "light_red", attrs=["bold"]))
+                print(self.no_cursor)
+                print(colored("Unknown option...", "light_red", attrs=["bold"]))
                 time.sleep(0.5)
 
     def prepend_changes(self):
@@ -252,12 +264,14 @@ class VersionLogic:
                 f.write(header + "\n")
 
         while True:
+            print(self.no_cursor)
             os.system(self.clear)
             print(self.header)
 
             print("Chosen change type:")
             print(colored(self.change_type, f"{self.color}"))
 
+            print(self.yes_cursor)
             self.change = prompt("\nChange entry > ")
 
             self.comment = prompt("\nOptional comment > ")
@@ -364,7 +378,10 @@ class VersionLogic:
 
     def view_md(self, log_content, message=None):
         # Callers: self.project_menu() & self.save_changes()
+
         flag = 0
+        console = Console()
+
         if not message:
             # Only check size when caller is self.project_menu()
             method = self.check_size()
@@ -383,21 +400,29 @@ class VersionLogic:
 
         # Respect self.check_size() verdict
         if flag:
-            with self.console.pager():
-                self.console.print(log_content)
-
+            if self.clear == "cls":
+                print(self.no_cursor)
+                print(log_content)
+            else:
+                with console.pager():
+                    console.print(log_content)
+		
             print(colored("\nThis log is too large to render in Markdown! (Max 10MB)", "yellow"))
             input("\nReturn...[Enter]")
             return
         else:
             md = Markdown(log_content)
-            self.console.print(md)
+            console.print(md)
 
         if not message:
-            choice = input("\nReturn...[Enter] / [P]ager view (Q - return) > ").strip().lower()
+            print(colored("\n/========================/", f"{self.color}"))
+            print(colored("P", f"{self.color}") + "ager view (q - return)\n")
+            
+            choice = input("Return...[Enter] > ").strip().lower()
+            
             if choice == "p":
-                with self.console.pager():
-                    self.console.print(md)
+                with console.pager():
+                    console.print(md)
         return
 
     def check_size(self):
@@ -408,6 +433,7 @@ class VersionLogic:
         size_mb = size / (1024 * 1024)
 
         if size > max_size:
+            print(self.no_cursor)
             print(colored(f"\nChangelog too large to load safely: {size_mb:.2f} MB", "light_red"))
             time.sleep(1.5)
             return "reject"
@@ -428,4 +454,4 @@ class VersionLogic:
         return template
 
 if __name__ == "__main__":
-    VersionLogic(config, color, header, cls, user_path)
+    VersionLogic(config)
