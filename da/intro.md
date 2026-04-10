@@ -17,6 +17,9 @@ Once configured, you can create as many changelog entries as you want by picking
 ### Using the program.
 1. **What *not* to do**
 
+> **Note:**
+> Windows only. if you have no third-party terminal pager, don't use the "Pager view" option for previewing changelogs.
+
 Don't change the folder structure or modify variable names inside `.ini` files.
 
 2. **Features and information**

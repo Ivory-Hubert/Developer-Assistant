@@ -44,6 +44,9 @@ Each project `.ini` can also hold a custom terminal command, that's run in the p
 ### Using the program.
 1. **What *not* to do**
 
+> **Note:**
+> Windows only. if you have no third-party terminal pager, don't use the "Pager view" option for previewing changelogs.
+
 Don't change the folder structure or modify variable names inside `.ini` files.
 
 2. **Features and information**
